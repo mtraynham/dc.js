@@ -70,13 +70,12 @@ dc.layerMixin.dataFn = {
 
 dc.layerMixin.layerFunctor = function (layerFn) {
     var input,
-        layered,
         output;
     var layerFunctor = function (chart, d) {
-        output = (layered = layerFn(chart, input = d)).prepare();
+        output = layerFn(chart, input = d);
     };
     layerFunctor.data = function () {
-        return layered.data;
+        return output.data;
     };
     layerFunctor.output = function () {
         return output;

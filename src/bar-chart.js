@@ -87,7 +87,47 @@ dc.barChart = function (parent, chartGroup) {
 
     _chart.layerFn(dc.barChart.layerFn.stack);
 
-    _chart.plotData = function () {};
+    _chart.plotData = function () {
+        var g = _chart.chartBodyG(),
+            data = _chart._prepareData();
+
+        var bars = g.selectAll('rect.bar')
+            .data(data, function (datum) {
+                return datum.key + datum.layer || '';
+            });
+
+        bars.enter()
+            .append('rect')
+            .attr('class', 'bar')
+            // .attr('fill', dc.pluck('data',_chart.getColor))
+            .attr('height', 0);
+
+        // if (_chart.renderTitle()) {
+        //     enter.append('title').text(dc.pluck('data',_chart.title(d.name)));
+        // }
+
+        // if (_chart.isOrdinal()) {
+        //     bars.on('click', onClick);
+        // }
+
+        dc.transition(bars, _chart.transitionDuration())
+            .attr('x', function (d) {
+                return dc.utils.safeNumber(d.x);
+            })
+            .attr('y', function (d) {
+                return dc.utils.safeNumber(d.y);
+            })
+            .attr('width', function (d) {
+                return d.width;
+            })
+            .attr('height', function (d) {
+                return d.height;
+            });
+
+        dc.transition(bars.exit(), _chart.transitionDuration())
+            .attr('height', 0)
+            .remove();
+    };
 
     _chart.fadeDeselectedArea = function () {};
 
@@ -140,10 +180,10 @@ dc.barChart.layerFn = {
             yAxisExtent = d3.extent(data, dc.pluck('values'));
         return {
             data: data,
-            xAxisMax: xAxisExtent[0] || 0,
-            xAxisMin: xAxisExtent[1] || 0,
-            yAxisMax: yAxisExtent[0] || 0,
-            yAxisMin: yAxisExtent[1] || 0,
+            xAxisMin: xAxisExtent[0] || 0,
+            xAxisMax: xAxisExtent[1] || 0,
+            yAxisMin: yAxisExtent[0] || 0,
+            yAxisMax: yAxisExtent[1] || 0,
             prepare: function () {
                 var _x = chart.x(),
                     _y = chart.y(),
@@ -173,10 +213,10 @@ dc.barChart.layerFn = {
         });
         return {
             data: data,
-            xAxisMax: xAxisExtent[0] || 0,
-            xAxisMin: xAxisExtent[1] || 0,
-            yAxisMax: yAxisExtent[0] || 0,
-            yAxisMin: yAxisExtent[1] || 0,
+            xAxisMin: xAxisExtent[0] || 0,
+            xAxisMax: xAxisExtent[1] || 0,
+            yAxisMin: yAxisExtent[0] || 0,
+            yAxisMax: yAxisExtent[1] || 0,
             prepare: function () {
                 var _x = chart.x(),
                     _y = chart.y(),
@@ -209,10 +249,10 @@ dc.barChart.layerFn = {
         }, 0);
         return {
             data: data,
-            xAxisMax: xAxisExtent[0] || 0,
-            xAxisMin: xAxisExtent[1] || 0,
-            yAxisMax: yAxisMax,
+            xAxisMin: xAxisExtent[0] || 0,
+            xAxisMax: xAxisExtent[1] || 0,
             yAxisMin: 0,
+            yAxisMax: yAxisMax,
             prepare: function () {
                 var _x = chart.x(),
                     _y = chart.y(),
@@ -241,10 +281,10 @@ dc.barChart.layerFn = {
         var xAxisExtent = d3.extent(data, dc.pluck('key'));
         return {
             data: data,
-            xAxisMax: xAxisExtent[0] || 0,
-            xAxisMin: xAxisExtent[1] || 0,
-            yAxisMax: 1,
+            xAxisMin: xAxisExtent[0] || 0,
+            xAxisMax: xAxisExtent[1] || 0,
             yAxisMin: 0,
+            yAxisMax: 1,
             prepare: function () {
                 var _x = chart.x(),
                     _y = chart.y(),
