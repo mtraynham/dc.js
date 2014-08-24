@@ -134,8 +134,8 @@ dc.barChart = function (parent, chartGroup) {
 };
 
 dc.barChart.layerFn = {
-    STANDARD: dc.layerMixin.layerFunctor(function (chart, data) {
-        data = dc.layerMixin.dataFn.STANDARD(chart, data);
+    standard: dc.layerMixin.layerFunctor(function (chart, data) {
+        data = dc.layerMixin.dataFn.standard(chart, data);
         var xAxisExtent = d3.extent(data, dc.pluck('key')),
             yAxisExtent = d3.extent(data, dc.pluck('values'));
         return {
@@ -163,11 +163,11 @@ dc.barChart.layerFn = {
             }
         };
     }),
-    GROUP: dc.layerMixin.layerFunctor(function (chart, data) {
-        var standardData = dc.layerMixin.dataFn.STANDARD(chart, data),
+    group: dc.layerMixin.layerFunctor(function (chart, data) {
+        var standardData = dc.layerMixin.dataFn.standard(chart, data),
             xAxisExtent = d3.extent(standardData, dc.pluck('key')),
             yAxisExtent = d3.extent(standardData, dc.pluck('values'));
-        data = dc.layerMixin.dataFn.LAYERED(chart, data);
+        data = dc.layerMixin.dataFn.layered(chart, data);
         var totalLayers = d3.max(data, function (datum) {
             return datum.values.length;
         });
@@ -200,8 +200,8 @@ dc.barChart.layerFn = {
         };
     }),
     // {key: 'a', values:[{key: 'x', values: 1}, {key: 'y', values: 2}]}
-    STACK: dc.layerMixin.layerFunctor(function (chart, data) {
-        data = dc.layerMixin.dataFn.LAYERED(chart, data);
+    stack: dc.layerMixin.layerFunctor(function (chart, data) {
+        data = dc.layerMixin.dataFn.layered(chart, data);
         var xAxisExtent = d3.extent(data, dc.pluck('key'));
         var yAxisMax = data.reduce(function (extent, datum) {
             var sum = d3.sum(datum.values, dc.pluck('values'));
@@ -236,8 +236,8 @@ dc.barChart.layerFn = {
             }
         };
     }),
-    STACK100: dc.layerMixin.layerFunctor(function (chart, data) {
-        data = dc.layerMixin.dataFn.LAYERED(chart, data);
+    stack100: dc.layerMixin.layerFunctor(function (chart, data) {
+        data = dc.layerMixin.dataFn.layered(chart, data);
         var xAxisExtent = d3.extent(data, dc.pluck('key'));
         return {
             data: data,

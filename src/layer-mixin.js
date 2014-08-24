@@ -19,8 +19,12 @@ dc.layerMixin = function (_chart) {
         return _chart;
     };
 
-    _chart.layeredDataFn = function () {
-        return _layerFn(_chart, _chart.data());
+    _chart._preprocessData = function () {
+        _layerFn(_chart, _chart.data());
+    };
+
+    _chart._prepareData = function () {
+        return _layerFn.prepare();
     };
 
     _chart.xAxisMax = function () {
@@ -42,35 +46,40 @@ dc.layerMixin = function (_chart) {
     _chart._ordinalXDomain = function () {
         return _layerFn.map(dc.pluck('key'));
     };
+    return _chart;
 };
 
 dc.layerMixin.dataFn = {
-    STANDARD: function (chart, data) {
+    standard: function (chart, data) {
         return d3.nest()
             .key(chart.keyAccessor())
-            .rollup(function (datum) {
-                return datum.value;
+            .rollup(function (datums) {
+                return d3.sum(datums, chart.valueAccessor());
             }).entries(data);
     },
-    LAYERED: function (chart, data) {
+    layered: function (chart, data) {
         return d3.nest()
             .key(chart.keyAccessor())
             .key(chart.layerAccessor() || function () { return 'all'; })
             .sortKeys(d3.ascending)
-            .rollup(function (datum) {
-                return datum.value;
+            .rollup(function (datums) {
+                return d3.sum(datums, chart.valueAccessor());
             }).entries(data);
     }
 };
 
 dc.layerMixin.layerFunctor = function (layerFn) {
     var input,
+        layered,
         output;
     var layerFunctor = function (chart, d) {
-        output = layerFn.call(chart, input = d);
+        output = (layered = layerFn(chart, input = d)).prepare();
     };
     layerFunctor.data = function () {
-        return output.data;
+        return layered.data;
+    };
+    layerFunctor.output = function () {
+        return output;
     };
     layerFunctor.xAxisMax = function () {
         return output.xAxisMax;
@@ -88,7 +97,7 @@ dc.layerMixin.layerFunctor = function (layerFn) {
         return input.map.apply(arguments);
     };
     layerFunctor.prepare = function () {
-        return output.prepare.call();
+        return output.prepare();
     };
     return layerFunctor;
 };
