@@ -85,7 +85,7 @@ dc.barChart = function (parent, chartGroup) {
     **/
     _chart.outerPadding = _chart._outerRangeBandPadding;
 
-    _chart.layerFn(dc.barChart.layerFn.stack);
+    _chart.layerFunctor(dc.barChart.layerFn.standard);
 
     _chart.plotData = function () {
         var g = _chart.chartBodyG(),

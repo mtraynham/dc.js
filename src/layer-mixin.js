@@ -1,5 +1,6 @@
 dc.layerMixin = function (_chart) {
     var _layerAccessor,
+        _layerFunctor,
         _layerFn;
 
     _chart.colorAccessor(function (d) {
@@ -14,41 +15,49 @@ dc.layerMixin = function (_chart) {
         return _chart;
     };
 
+    _chart.layerFunctor = function (_) {
+        if (!arguments.length) {
+            return _layerFunctor;
+        }
+        _layerFunctor = _;
+        _chart.expireCache();
+        return _chart;
+    };
+
     _chart.layerFn = function (_) {
         if (!arguments.length) {
             return _layerFn;
         }
         _layerFn = _;
-        _chart.expireCache();
         return _chart;
     };
 
     _chart._preprocessData = function () {
-        _layerFn(_chart, _chart.data());
+        _chart.layerFn(_chart.layerFunctor()(_chart, _chart.data()));
     };
 
     _chart._prepareData = function () {
-        return _layerFn.prepare();
+        return _chart.layerFn().prepare();
     };
 
     _chart.xAxisMax = function () {
-        return dc.utils.add(_layerFn.xAxisMax(), _chart.xAxisPadding());
+        return dc.utils.add(_chart.layerFn().xAxisMax(), _chart.xAxisPadding());
     };
 
     _chart.xAxisMin = function () {
-        return dc.utils.subtract(_layerFn.xAxisMin(), _chart.xAxisPadding());
+        return dc.utils.subtract(_chart.layerFn().xAxisMin(), _chart.xAxisPadding());
     };
 
     _chart.yAxisMax = function () {
-        return dc.utils.add(_layerFn.yAxisMax(), _chart.yAxisPadding());
+        return dc.utils.add(_chart.layerFn().yAxisMax(), _chart.yAxisPadding());
     };
 
     _chart.yAxisMin = function () {
-        return dc.utils.subtract(_layerFn.yAxisMin(), _chart.yAxisPadding());
+        return dc.utils.subtract(_chart.layerFn().yAxisMin(), _chart.yAxisPadding());
     };
 
     _chart._ordinalXDomain = function () {
-        return _layerFn.map(dc.pluck('key'));
+        return _chart.layerFn().input().map(dc.pluck('key'));
     };
     return _chart;
 };
@@ -73,34 +82,30 @@ dc.layerMixin.dataFn = {
 };
 
 dc.layerMixin.layerFunctor = function (layerFn) {
-    var input,
-        output;
-    var layerFunctor = function (chart, d) {
-        output = layerFn(chart, input = d);
+    return function (chart, input) {
+        var output = layerFn(chart, input);
+        return {
+            input: function () {
+                return input;
+            },
+            data: function () {
+                return output.data;
+            },
+            xAxisMax: function () {
+                return output.xAxisMax;
+            },
+            xAxisMin: function () {
+                return output.xAxisMin;
+            },
+            yAxisMax: function () {
+                return output.yAxisMax;
+            },
+            yAxisMin: function () {
+                return output.yAxisMin;
+            },
+            prepare: function () {
+                return output.prepare();
+            }
+        };
     };
-    layerFunctor.data = function () {
-        return output.data;
-    };
-    layerFunctor.output = function () {
-        return output;
-    };
-    layerFunctor.xAxisMax = function () {
-        return output.xAxisMax;
-    };
-    layerFunctor.xAxisMin = function () {
-        return output.xAxisMin;
-    };
-    layerFunctor.yAxisMax = function () {
-        return output.yAxisMax;
-    };
-    layerFunctor.yAxisMin = function () {
-        return output.yAxisMin;
-    };
-    layerFunctor.map = function () {
-        return input.map.apply(arguments);
-    };
-    layerFunctor.prepare = function () {
-        return output.prepare();
-    };
-    return layerFunctor;
 };
