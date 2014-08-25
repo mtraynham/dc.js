@@ -2,6 +2,10 @@ dc.layerMixin = function (_chart) {
     var _layerAccessor,
         _layerFn;
 
+    _chart.colorAccessor(function (d) {
+        return d.layer || '';
+    });
+
     _chart.layerAccessor = function (_) {
         if (!arguments.length) {
             return _layerAccessor;

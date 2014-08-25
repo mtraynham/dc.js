@@ -99,30 +99,14 @@ dc.barChart = function (parent, chartGroup) {
         bars.enter()
             .append('rect')
             .attr('class', 'bar')
-            // .attr('fill', dc.pluck('data',_chart.getColor))
+            .attr('fill', _chart.getColor)
             .attr('height', 0);
 
-        // if (_chart.renderTitle()) {
-        //     enter.append('title').text(dc.pluck('data',_chart.title(d.name)));
-        // }
-
-        // if (_chart.isOrdinal()) {
-        //     bars.on('click', onClick);
-        // }
-
         dc.transition(bars, _chart.transitionDuration())
-            .attr('x', function (d) {
-                return dc.utils.safeNumber(d.x);
-            })
-            .attr('y', function (d) {
-                return dc.utils.safeNumber(d.y);
-            })
-            .attr('width', function (d) {
-                return d.width;
-            })
-            .attr('height', function (d) {
-                return d.height;
-            });
+            .attr('x', dc.pluck('x'))
+            .attr('y', dc.pluck('y'))
+            .attr('width', dc.pluck('width'))
+            .attr('height', dc.pluck('height'));
 
         dc.transition(bars.exit(), _chart.transitionDuration())
             .attr('height', 0)
@@ -187,17 +171,20 @@ dc.barChart.layerFn = {
             prepare: function () {
                 var _x = chart.x(),
                     _y = chart.y(),
-                    bWidth = chart.width() / data.length;
+                    bWidth = chart.xUnitCount(),
+                    cHeight = chart.height();
                 return data.map(function (datum) {
-                    var x = _x(datum.key),
-                        y = _y(datum.values);
+                    var key = datum.key,
+                        value = datum.values,
+                        x = _x(key),
+                        y = _y(value);
                     return {
-                        key: datum.key,
-                        value: datum.values,
+                        key: key,
+                        value: value,
                         x: x,
                         y: y,
-                        width: x + bWidth,
-                        height: chart.height() - y
+                        width: bWidth,
+                        height: cHeight - y
                     };
                 });
             }
@@ -220,19 +207,22 @@ dc.barChart.layerFn = {
             prepare: function () {
                 var _x = chart.x(),
                     _y = chart.y(),
-                    bWidth = chart.width() / (data.length * totalLayers);
+                    bWidth = chart.xUnitCount() / totalLayers,
+                    cHeight = chart.height();
                 return data.reduce(function (previous, datum) {
+                    var key = datum.key,
+                        x = _x(key);
                     return previous.concat(datum.values.map(function (layerDatum) {
-                        var x = _x(datum.key),
-                            y = _y(layerDatum.values);
+                        var value = layerDatum.values,
+                            y = _y(value);
                         return {
-                            key: datum.key,
+                            key: key,
                             layer: layerDatum.key,
-                            value: layerDatum.values,
+                            value: value,
                             x: x,
                             y: y,
-                            width: x + bWidth,
-                            height: chart.height() - y
+                            width: bWidth,
+                            height: cHeight - y
                         };
                     }));
                 }, []);
@@ -256,20 +246,23 @@ dc.barChart.layerFn = {
             prepare: function () {
                 var _x = chart.x(),
                     _y = chart.y(),
-                    bWidth = chart.width() / data.length;
+                    bWidth = chart.xUnitCount(),
+                    cHeight = chart.height();
                 return data.reduce(function (previous, datum) {
-                    var x = _x(datum.key);
+                    var key = datum.key,
+                        x = _x(key);
                     return previous.concat(datum.values.reduce(function (previous, layerDatum, i) {
-                        var y = _y(layerDatum.values),
-                            yP = i !== 0 ? previous[i].y : 0;
+                        var values = layerDatum.values,
+                            y = _y(values),
+                            yP = i ? previous[i].y : 0;
                         return {
-                            key: datum.key,
+                            key: key,
                             layer: layerDatum.key,
-                            value: layerDatum.values,
+                            value: values,
                             x: x,
                             y: y,
-                            width: x + bWidth,
-                            height: chart.height() - (y - yP)
+                            width: bWidth,
+                            height: cHeight - (y - yP)
                         };
                     }, []));
                 }, []);
@@ -288,21 +281,24 @@ dc.barChart.layerFn = {
             prepare: function () {
                 var _x = chart.x(),
                     _y = chart.y(),
-                    bWidth = chart.width() / data.length;
+                    bWidth = chart.xUnitCount(),
+                    cHeight = chart.height();
                 return data.reduce(function (previous, datum) {
-                    var x = _x(datum.key);
-                    var total = d3.sum(datum.values, dc.pluck('values'));
+                    var key = datum.key,
+                        x = _x(key),
+                        total = d3.sum(datum.values, dc.pluck('values'));
                     return previous.concat(datum.values.reduce(function (previous, layerDatum, i) {
-                        var y = _y(layerDatum.values / total),
-                            yP = i !== 0 ? previous[i].y : 0;
+                        var value = layerDatum.values,
+                            y = _y(value / total),
+                            yP = i ? previous[i].y : 0;
                         return {
-                            key: datum.key,
+                            key: key,
                             layer: layerDatum.key,
-                            value: layerDatum.values,
+                            value: value,
                             x: x,
                             y: y,
-                            width: x + bWidth,
-                            height: chart.height() - (y - yP)
+                            width: bWidth,
+                            height: cHeight - (y - yP)
                         };
                     }, []));
                 }, []);
