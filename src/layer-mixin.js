@@ -4,7 +4,7 @@ dc.layerMixin = function (_chart) {
         _layerFn;
 
     _chart.colorAccessor(function (d) {
-        return d.layer || '';
+        return d.layer || d.key;
     });
 
     _chart.layerAccessor = function (_) {
@@ -37,7 +37,7 @@ dc.layerMixin = function (_chart) {
     };
 
     _chart._prepareData = function () {
-        return _chart.layerFn().prepare();
+        return _chart.layerFn().prepare(_chart);
     };
 
     _chart.xAxisMax = function () {
@@ -105,6 +105,9 @@ dc.layerMixin.layerFunctor = function (layerFn) {
             },
             prepare: function () {
                 return output.prepare();
+            },
+            render: function (chart, g) {
+                return output.render(chart, g);
             }
         };
     };

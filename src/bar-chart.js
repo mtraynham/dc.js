@@ -102,11 +102,7 @@ dc.barChart = function (parent, chartGroup) {
             .attr('fill', _chart.getColor)
             .attr('height', 0);
 
-        dc.transition(bars, _chart.transitionDuration())
-            .attr('x', dc.pluck('x'))
-            .attr('y', dc.pluck('y'))
-            .attr('width', dc.pluck('width'))
-            .attr('height', dc.pluck('height'));
+        _chart.layerFn().render(_chart, dc.transition(bars, _chart.transitionDuration()));
 
         dc.transition(bars.exit(), _chart.transitionDuration())
             .attr('height', 0)
@@ -168,64 +164,16 @@ dc.barChart.layerFn = {
             xAxisMax: xAxisExtent[1] || 0,
             yAxisMin: yAxisExtent[0] || 0,
             yAxisMax: yAxisExtent[1] || 0,
-            prepare: function () {
+            prepare: d3.functor(data),
+            render: function (chart, g) {
                 var _x = chart.x(),
                     _y = chart.y(),
                     bWidth = chart.xUnitCount(),
                     cHeight = chart.height();
-                return data.map(function (datum) {
-                    var key = datum.key,
-                        value = datum.values,
-                        x = _x(key),
-                        y = _y(value);
-                    return {
-                        key: key,
-                        value: value,
-                        x: x,
-                        y: y,
-                        width: bWidth,
-                        height: cHeight - y
-                    };
-                });
-            }
-        };
-    }),
-    group: dc.layerMixin.layerFunctor(function (chart, data) {
-        var standardData = dc.layerMixin.dataFn.standard(chart, data),
-            xAxisExtent = d3.extent(standardData, dc.pluck('key')),
-            yAxisExtent = d3.extent(standardData, dc.pluck('values'));
-        data = dc.layerMixin.dataFn.layered(chart, data);
-        var totalLayers = d3.max(data, function (datum) {
-            return datum.values.length;
-        });
-        return {
-            data: data,
-            xAxisMin: xAxisExtent[0] || 0,
-            xAxisMax: xAxisExtent[1] || 0,
-            yAxisMin: yAxisExtent[0] || 0,
-            yAxisMax: yAxisExtent[1] || 0,
-            prepare: function () {
-                var _x = chart.x(),
-                    _y = chart.y(),
-                    bWidth = chart.xUnitCount() / totalLayers,
-                    cHeight = chart.height();
-                return data.reduce(function (previous, datum) {
-                    var key = datum.key,
-                        x = _x(key);
-                    return previous.concat(datum.values.map(function (layerDatum) {
-                        var value = layerDatum.values,
-                            y = _y(value);
-                        return {
-                            key: key,
-                            layer: layerDatum.key,
-                            value: value,
-                            x: x,
-                            y: y,
-                            width: bWidth,
-                            height: cHeight - y
-                        };
-                    }));
-                }, []);
+                g.attr('x', function (d) { return _x(d.key); })
+                    .attr('y', function (d) { return _y(d.values); })
+                    .attr('width', bWidth)
+                    .attr('height', function (d) { return cHeight - _y(d.values); });
             }
         };
     }),
@@ -235,7 +183,7 @@ dc.barChart.layerFn = {
         var xAxisExtent = d3.extent(data, dc.pluck('key'));
         var yAxisMax = data.reduce(function (extent, datum) {
             var sum = d3.sum(datum.values, dc.pluck('values'));
-            return Math.max(extent[1], sum);
+            return Math.max(extent, sum);
         }, 0);
         return {
             data: data,
@@ -244,28 +192,28 @@ dc.barChart.layerFn = {
             yAxisMin: 0,
             yAxisMax: yAxisMax,
             prepare: function () {
-                var _x = chart.x(),
-                    _y = chart.y(),
-                    bWidth = chart.xUnitCount(),
-                    cHeight = chart.height();
-                return data.reduce(function (previous, datum) {
-                    var key = datum.key,
-                        x = _x(key);
-                    return previous.concat(datum.values.reduce(function (previous, layerDatum, i) {
-                        var values = layerDatum.values,
-                            y = _y(values),
-                            yP = i ? previous[i].y : 0;
-                        return {
+                return data.reduce(function (prev, datum) {
+                    var key = datum.key;
+                    return prev.concat(datum.values.reduce(function (previous, layerDatum) {
+                        previous[0].push({
                             key: key,
                             layer: layerDatum.key,
-                            value: values,
-                            x: x,
-                            y: y,
-                            width: bWidth,
-                            height: cHeight - (y - yP)
-                        };
-                    }, []));
+                            values0: previous[1],
+                            values1: previous[1] += layerDatum.values
+                        });
+                        return previous;
+                    }, [[], 0])[0]);
                 }, []);
+            },
+            render: function (chart, g) {
+                var _x = chart.x(),
+                    _y = chart.y(),
+                    bWidth = chart.xUnitCount();
+                g.attr('y', function (d) { return _y(d.values1); })
+                    .attr('height', function (d) { return _y(d.values0) - _y(d.values1); })
+                    .transition()
+                    .attr('x', function (d) { return _x(d.key); })
+                    .attr('width', bWidth);
             }
         };
     }),
@@ -279,30 +227,70 @@ dc.barChart.layerFn = {
             yAxisMin: 0,
             yAxisMax: 1,
             prepare: function () {
-                var _x = chart.x(),
-                    _y = chart.y(),
-                    bWidth = chart.xUnitCount(),
-                    cHeight = chart.height();
-                return data.reduce(function (previous, datum) {
+                return data.reduce(function (prev, datum) {
                     var key = datum.key,
-                        x = _x(key),
                         total = d3.sum(datum.values, dc.pluck('values'));
-                    return previous.concat(datum.values.reduce(function (previous, layerDatum, i) {
-                        var value = layerDatum.values,
-                            y = _y(value / total),
-                            yP = i ? previous[i].y : 0;
-                        return {
+                    return prev.concat(datum.values.reduce(function (previous, layerDatum) {
+                        previous[0].push({
                             key: key,
                             layer: layerDatum.key,
-                            value: value,
-                            x: x,
-                            y: y,
-                            width: bWidth,
-                            height: cHeight - (y - yP)
-                        };
-                    }, []));
+                            values0: previous[1],
+                            values1: previous[1] += (layerDatum.values / total)
+                        });
+                        return previous;
+                    }, [[], 0])[0]);
                 }, []);
+            },
+            render: function (chart, g) {
+                var _x = chart.x(),
+                    _y = chart.y(),
+                    bWidth = chart.xUnitCount();
+                g.attr('y', function (d) { return _y(d.values1); })
+                    .attr('height', function (d) { return _y(d.values0) - _y(d.values1); })
+                    .transition()
+                    .attr('x', function (d) { return _x(d.key); })
+                    .attr('width', bWidth);
             }
         };
     }),
+    group: dc.layerMixin.layerFunctor(function (chart, data) {
+        var standardData = dc.layerMixin.dataFn.standard(chart, data),
+            xAxisExtent = d3.extent(standardData, dc.pluck('key')),
+            yAxisExtent = d3.extent(data, dc.pluck('value'));
+        data = dc.layerMixin.dataFn.layered(chart, data);
+        var totalLayers = d3.max(data, function (datum) {
+            return datum.values.length;
+        });
+        return {
+            data: data,
+            xAxisMin: xAxisExtent[0] || 0,
+            xAxisMax: xAxisExtent[1] || 0,
+            yAxisMin: yAxisExtent[0] || 0,
+            yAxisMax: yAxisExtent[1] || 0,
+            prepare: function () {
+                return data.reduce(function (previous, datum) {
+                    var key = datum.key;
+                    return previous.concat(datum.values.map(function (layerDatum, i) {
+                        return {
+                            key: key,
+                            layer: layerDatum.key,
+                            values: layerDatum.values,
+                            index: i
+                        };
+                    }));
+                }, []);
+            },
+            render: function (chart, g) {
+                var _x = chart.x(),
+                    _y = chart.y(),
+                    bWidth = chart.xUnitCount() / totalLayers,
+                    cHeight = chart.height();
+                g.attr('x', function (d) { return _x(d.key) + bWidth * d.index; })
+                    .attr('width', bWidth)
+                    .transition()
+                    .attr('y', function (d) { return _y(d.values); })
+                    .attr('height', function (d) { return cHeight - _y(d.values); });
+            }
+        };
+    })
 };
