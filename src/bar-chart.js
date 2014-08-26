@@ -270,12 +270,12 @@ dc.barChart.layerFn = {
             prepare: function () {
                 return data.reduce(function (previous, datum) {
                     var key = datum.key;
-                    return previous.concat(datum.values.map(function (layerDatum, i) {
+                    return previous.concat(datum.values.map(function (layerDatum, index) {
                         return {
                             key: key,
                             layer: layerDatum.key,
                             values: layerDatum.values,
-                            index: i
+                            index: index
                         };
                     }));
                 }, []);
