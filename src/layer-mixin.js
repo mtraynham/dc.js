@@ -4,7 +4,7 @@ dc.layerMixin = function (_chart) {
         _layerFn;
 
     _chart.colorAccessor(function (d) {
-        return d.layer || d.key;
+        return d.layer || null;
     });
 
     _chart.layerAccessor = function (_) {

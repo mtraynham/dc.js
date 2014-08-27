@@ -87,6 +87,22 @@ dc.barChart = function (parent, chartGroup) {
 
     _chart.layerFunctor(dc.barChart.layerFn.standard);
 
+    _chart.barWidth = function () {
+        var numberOfBars = _chart.xUnitCount(),
+            barWidth = MIN_BAR_WIDTH;
+        if (_chart.isOrdinal() && _gap === undefined) {
+            barWidth = Math.floor(_chart.x().rangeBand());
+        } else if (_gap) {
+            barWidth = Math.floor((_chart.xAxisLength() - (numberOfBars - 1) * _gap) / numberOfBars);
+        } else {
+            barWidth = Math.floor(_chart.xAxisLength() / (1 + _chart.barPadding()) / numberOfBars);
+        }
+        if (barWidth === Infinity || isNaN(barWidth) || barWidth < MIN_BAR_WIDTH) {
+            barWidth = MIN_BAR_WIDTH;
+        }
+        return barWidth;
+    };
+
     _chart.plotData = function () {
         var g = _chart.chartBodyG(),
             data = _chart._prepareData();
@@ -168,7 +184,7 @@ dc.barChart.layerFn = {
             render: function (chart, g) {
                 var _x = chart.x(),
                     _y = chart.y(),
-                    bWidth = chart.xUnitCount(),
+                    bWidth = chart.barWidth(),
                     cHeight = chart.height();
                 g.attr('x', function (d) { return _x(d.key); })
                     .attr('y', function (d) { return _y(d.values); })
@@ -208,7 +224,7 @@ dc.barChart.layerFn = {
             render: function (chart, g) {
                 var _x = chart.x(),
                     _y = chart.y(),
-                    bWidth = chart.xUnitCount();
+                    bWidth = chart.barWidth();
                 g.attr('y', function (d) { return _y(d.values1); })
                     .attr('height', function (d) { return _y(d.values0) - _y(d.values1); })
                     .transition()
@@ -244,7 +260,7 @@ dc.barChart.layerFn = {
             render: function (chart, g) {
                 var _x = chart.x(),
                     _y = chart.y(),
-                    bWidth = chart.xUnitCount();
+                    bWidth = chart.barWidth();
                 g.attr('y', function (d) { return _y(d.values1); })
                     .attr('height', function (d) { return _y(d.values0) - _y(d.values1); })
                     .transition()
@@ -270,12 +286,12 @@ dc.barChart.layerFn = {
             prepare: function () {
                 return data.reduce(function (previous, datum) {
                     var key = datum.key;
-                    return previous.concat(datum.values.map(function (layerDatum, index) {
+                    return previous.concat(datum.values.map(function (layerDatum, i) {
                         return {
                             key: key,
                             layer: layerDatum.key,
                             values: layerDatum.values,
-                            index: index
+                            index: i
                         };
                     }));
                 }, []);
@@ -283,7 +299,7 @@ dc.barChart.layerFn = {
             render: function (chart, g) {
                 var _x = chart.x(),
                     _y = chart.y(),
-                    bWidth = chart.xUnitCount() / totalLayers,
+                    bWidth = chart.barWidth() / totalLayers,
                     cHeight = chart.height();
                 g.attr('x', function (d) { return _x(d.key) + bWidth * d.index; })
                     .attr('width', bWidth)
