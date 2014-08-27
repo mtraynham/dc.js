@@ -2,7 +2,7 @@ dc.lineChart = function (parent, chartGroup) {
     var DEFAULT_DOT_RADIUS = 5,
         DEFAULT_DOT_OPACITY = 1e-6;
 
-    var _chart = dc.stackMixin(dc.coordinateGridMixin({})),
+    var _chart = dc.layerMixin(dc.coordinateGridMixin({})),
         _renderArea = false,
         _dotRadius = DEFAULT_DOT_RADIUS,
         _dataPointRadius = null,
