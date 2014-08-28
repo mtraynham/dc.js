@@ -36,10 +36,6 @@ dc.layerMixin = function (_chart) {
         _chart.layerFn(_chart.layerFunctor()(_chart, _chart.data()));
     };
 
-    _chart._prepareData = function () {
-        return _chart.layerFn().prepare(_chart);
-    };
-
     _chart.xAxisMax = function () {
         return dc.utils.add(_chart.layerFn().xAxisMax(), _chart.xAxisPadding());
     };
@@ -70,10 +66,19 @@ dc.layerMixin.dataFn = {
                 return d3.sum(datums, chart.valueAccessor());
             }).entries(data);
     },
-    layered: function (chart, data) {
+    key: function (chart, data) {
         return d3.nest()
             .key(chart.keyAccessor())
             .key(chart.layerAccessor() || function () { return 'all'; })
+            .sortKeys(d3.ascending)
+            .rollup(function (datums) {
+                return d3.sum(datums, chart.valueAccessor());
+            }).entries(data);
+    },
+    layer: function (chart, data) {
+        return d3.nest()
+            .key(chart.layerAccessor() || function () { return 'all'; })
+            .key(chart.keyAccessor())
             .sortKeys(d3.ascending)
             .rollup(function (datums) {
                 return d3.sum(datums, chart.valueAccessor());
@@ -102,9 +107,6 @@ dc.layerMixin.layerFunctor = function (layerFn) {
             },
             yAxisMin: function () {
                 return output.yAxisMin;
-            },
-            prepare: function () {
-                return output.prepare();
             },
             render: function (chart, g) {
                 return output.render(chart, g);

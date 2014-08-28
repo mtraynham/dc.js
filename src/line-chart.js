@@ -136,13 +136,13 @@ dc.lineChart = function (parent, chartGroup) {
 
     _chart.plotData = function () {
         var g = _chart.chartBodyG(),
-            data = _chart._prepareData(),
+            data = _chart.layerFn().data,
             chartSpec = _chart.layerFn().render(_chart, g);
 
         // Layers
         var layers = g.selectAll('g.layer')
             .data(data, function (datum) {
-                return datum.layer;
+                return datum.key + datum.layer || 0;
             }),
             layersEnter = layers.enter()
                 .append('g')
@@ -154,14 +154,14 @@ dc.lineChart = function (parent, chartGroup) {
         dc.transition(layers.select('path.line'), _chart.transitionDuration())
             .attr('stroke', _chart.getColor)
             .attr('stroke-dasharray', _dashStyle || '')
-            .attr('d', function (d) { return _safePath(chartSpec.line(d)); });
+            .attr('d', function (d) { return _safePath(chartSpec.line(d.values)); });
 
         // Area
         layersEnter.append('path')
             .attr('class', 'area');
         dc.transition(layers.select('path.area'), _chart.transitionDuration())
             .attr('fill', _chart.getColor)
-            .attr('d', function (d) { return _safePath(chartSpec.area(d)); });
+            .attr('d', function (d) { return _safePath(chartSpec.area(d.values)); });
 
         layers.exit().remove();
 
@@ -235,75 +235,154 @@ dc.lineChart = function (parent, chartGroup) {
 
 dc.lineChart.layerFn = {
     standard: dc.layerMixin.layerFunctor(function (chart, data) {
-        data = dc.layerMixin.dataFn.layered(chart, data);
-        var xAxisExtent = d3.extent(data, dc.pluck('key')),
-            yAxisExtent = d3.extent(data, dc.pluck('values'));
+        var standard = dc.layerMixin.dataFn.standard(chart, data),
+            xAxisExtent = d3.extent(standard, dc.pluck('key'));
+        data = dc.layerMixin.dataFn.layer(chart, data);
+        var yAxisExtent = data.reduce(function (extent, datum) {
+            var extentP = d3.extent(datum.values, dc.pluck('values'));
+            return [Math.min(extent[0], extentP[0]), Math.max(extent[1], extentP[1])];
+        }, [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]);
         return {
             data: data,
             xAxisMin: xAxisExtent[0] || 0,
             xAxisMax: xAxisExtent[1] || 0,
-            yAxisMin: yAxisExtent[0] || 0,
-            yAxisMax: yAxisExtent[1] || 0,
-            prepare: d3.functor(data),
-            render: function () {}
+            yAxisMin: yAxisExtent[0] === Number.POSITIVE_INFINITY ? 0 : yAxisExtent[0],
+            yAxisMax: yAxisExtent[1] === Number.NEGATIVE_INFINITY ? 0 : yAxisExtent[1],
+            render: function (chart) {
+                var _x = chart.x(),
+                    _y = chart.y(),
+                    _y0 = _y(0),
+                    _line = d3.svg.line()
+                        .x(function (d) { return _x(d.key); })
+                        .y(function (d) { return _y(d.values); })
+                        .interpolate(chart.interpolate())
+                        .tension(chart.tension()),
+                    _area = d3.svg.area()
+                        .x(function (d) { return _x(d.key); })
+                        .y(function (d) { return _y(d.values); })
+                        .y0(_y0)
+                        .interpolate(chart.interpolate())
+                        .tension(chart.tension());
+                if (chart.defined()) {
+                    _line.defined(chart.defined());
+                    _area.defined(chart.defined());
+                }
+                return {
+                    line: _line,
+                    area: _area
+                };
+            }
         };
     }),
-    // {key: 'a', values:[{key: 'x', values: 1}, {key: 'y', values: 2}]}
     stack: dc.layerMixin.layerFunctor(function (chart, data) {
-        data = dc.layerMixin.dataFn.layered(chart, data);
-        var xAxisExtent = d3.extent(data, dc.pluck('key'));
-        var yAxisMax = data.reduce(function (extent, datum) {
-            var sum = d3.sum(datum.values, dc.pluck('values'));
-            return Math.max(extent, sum);
-        }, 0);
+        var xAxisExtent = d3.extent(dc.layerMixin.dataFn.standard(chart, data), dc.pluck('key'));
+        data = dc.layerMixin.dataFn.layer(chart, data);
+        var keyMap = {};
+        data = data.map(function (datum) {
+            return {
+                key: datum.key,
+                values: datum.values.reduce(function (previous, keyDatum) {
+                    var key = keyDatum.key;
+                    previous.push({
+                        key: keyDatum.key,
+                        values0: keyMap[key] = keyMap[key] || 0,
+                        values1: keyMap[key] += keyDatum.values
+                    });
+                    return previous;
+                }, [])
+            };
+        });
+        var yAxisMax = 0;
+        for (var key in keyMap) {
+            yAxisMax = Math.max(keyMap[key], yAxisMax);
+        }
         return {
             data: data,
             xAxisMin: xAxisExtent[0] || 0,
             xAxisMax: xAxisExtent[1] || 0,
             yAxisMin: 0,
-            yAxisMax: yAxisMax,
-            prepare: function () {
-                return data.reduce(function (prev, datum) {
-                    var key = datum.key;
-                    return prev.concat(datum.values.reduce(function (previous, layerDatum) {
-                        previous[0].push({
-                            key: key,
-                            layer: layerDatum.key,
-                            values0: previous[1],
-                            values1: previous[1] += layerDatum.values
-                        });
-                        return previous;
-                    }, [[], 0])[0]);
-                }, []);
-            },
-            render: function () {}
+            yAxisMax: yAxisMax || 0,
+            render: function (chart) {
+                var _x = chart.x(),
+                    _y = chart.y(),
+                    _line = d3.svg.line()
+                        .x(function (d) { return _x(d.key); })
+                        .y(function (d) { return _y(d.values1); })
+                        .interpolate(chart.interpolate())
+                        .tension(chart.tension()),
+                    _area = d3.svg.area()
+                        .x(function (d) { return _x(d.key); })
+                        .y(function (d) { return _y(d.values1); })
+                        .y0(function (d) { return _y(d.values0); })
+                        .interpolate(chart.interpolate())
+                        .tension(chart.tension());
+                if (chart.defined()) {
+                    _line.defined(chart.defined());
+                    _area.defined(chart.defined());
+                }
+                return {
+                    line: _line,
+                    area: _area
+                };
+            }
         };
     }),
     stack100: dc.layerMixin.layerFunctor(function (chart, data) {
-        data = dc.layerMixin.dataFn.layered(chart, data);
-        var xAxisExtent = d3.extent(data, dc.pluck('key'));
+        var xAxisExtent = d3.extent(dc.layerMixin.dataFn.standard(chart, data), dc.pluck('key'));
+        data = dc.layerMixin.dataFn.layer(chart, data);
+        var keyMap = {};
+        data = data.map(function (datum) {
+            return {
+                key: datum.key,
+                values: datum.values.reduce(function (previous, keyDatum) {
+                    var key = keyDatum.key;
+                    previous.push({
+                        key: keyDatum.key,
+                        values0: keyMap[key] = keyMap[key] || 0,
+                        values1: keyMap[key] += keyDatum.values
+                    });
+                    return previous;
+                }, [])
+            };
+        });
+        data.forEach(function (datum) {
+            datum.values.forEach(function (datumValues) {
+                var total = keyMap[datumValues.key];
+                if (total) {
+                    datumValues.values0 /= total;
+                    datumValues.values1 /= total;
+                }
+            });
+        });
         return {
             data: data,
             xAxisMin: xAxisExtent[0] || 0,
             xAxisMax: xAxisExtent[1] || 0,
             yAxisMin: 0,
             yAxisMax: 1,
-            prepare: function () {
-                return data.reduce(function (prev, datum) {
-                    var key = datum.key,
-                        total = d3.sum(datum.values, dc.pluck('values'));
-                    return prev.concat(datum.values.reduce(function (previous, layerDatum) {
-                        previous[0].push({
-                            key: key,
-                            layer: layerDatum.key,
-                            values0: previous[1],
-                            values1: previous[1] += (layerDatum.values / total)
-                        });
-                        return previous;
-                    }, [[], 0])[0]);
-                }, []);
-            },
-            render: function () {}
+            render: function (chart) {
+                var _x = chart.x(),
+                    _y = chart.y(),
+                    _line = d3.svg.line()
+                        .x(function (d) { return _x(d.key); })
+                        .y(function (d) { return _y(d.values1); })
+                        .interpolate(chart.interpolate())
+                        .tension(chart.tension()),
+                    _area = d3.svg.area()
+                        .x(function (d) { return _x(d.key); })
+                        .y(function (d) { return _y(d.values1); })
+                        .y0(function (d) { return _y(d.values0); })
+                        .interpolate(chart.interpolate())
+                        .tension(chart.tension());
+                if (chart.defined()) {
+                    _line.defined(chart.defined());
+                    _area.defined(chart.defined());
+                }
+                return {
+                    line: _line,
+                    area: _area
+                };
+            }
         };
     })
 };
