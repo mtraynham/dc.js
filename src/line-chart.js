@@ -135,66 +135,99 @@ dc.lineChart = function (parent, chartGroup) {
     };
 
     _chart.plotData = function () {
-        var g = _chart.chartBodyG(),
-            data = _chart.layerFn().data,
-            chartSpec = _chart.layerFn().render(_chart, g);
+        var _g = _chart.chartBodyG(),
+            _data = _chart.layerFn().data,
+            _x = _chart.x(),
+            _y = _chart.y(),
+            _line = d3.svg.line()
+                .x(function (d) { return _x(d.key); })
+                .y(function (d) { return _y(d.values); })
+                .interpolate(_chart.interpolate())
+                .tension(_chart.tension()),
+            _lineEnterExit = d3.svg.line()
+                .x(function (d) { return _x(d.key); })
+                .y(function () { return _y(0); })
+                .interpolate(_chart.interpolate())
+                .tension(_chart.tension()),
+            _area = d3.svg.area()
+                .x(function (d) { return _x(d.key); })
+                .y(function (d) { return _y(d.values); })
+                .y0(function (d) { return _y(d.values0); })
+                .interpolate(_chart.interpolate())
+                .tension(_chart.tension()),
+            _areaEnterExit = d3.svg.area()
+                .x(function (d) { return _x(d.key); })
+                .y(function () { return _y(0); })
+                .y0(function () { return _y(0); })
+                .interpolate(_chart.interpolate())
+                .tension(_chart.tension());
 
         // Layers
-        var layers = g.selectAll('g.layer')
-            .data(data, function (datum) {
-                return datum.key;
-            }),
+        var layers = _g.selectAll('g.layer')
+            .data(_data, function (datum, i) { return i; }),
             layersEnter = layers.enter()
                 .append('g')
-                .attr('class', 'layer');
+                .attr('class', 'layer'),
+            layersExit = layers.exit();
 
         // Lines
         layersEnter.append('path')
-            .attr('class', 'line');
+            .attr('class', 'line')
+            .attr('stroke', _chart.getColor)
+            .attr('stroke-dasharray', _dashStyle || '')
+            .attr('d', function (d) { return _safePath(_lineEnterExit(d.values)); });
         dc.transition(layers.select('path.line'), _chart.transitionDuration())
             .attr('stroke', _chart.getColor)
             .attr('stroke-dasharray', _dashStyle || '')
-            .attr('d', function (d) {
-                return _safePath(chartSpec.line(d.values));
-            });
+            .attr('d', function (d) { return _safePath(_line(d.values)); });
+        dc.transition(layersExit.select('path.line'), _chart.transitionDuration())
+            .attr('d', function (d) { return _safePath(_lineEnterExit(d.values)); });
 
         // Area
         layersEnter.append('path')
-            .attr('class', 'area');
+            .attr('class', 'area')
+            .attr('fill', _chart.getColor)
+            .attr('visible', _chart.renderArea)
+            .attr('d', function (d) { return _safePath(_areaEnterExit(d.values)); });
         dc.transition(layers.select('path.area'), _chart.transitionDuration())
             .attr('fill', _chart.getColor)
-            .attr('d', function (d) { return _safePath(chartSpec.area(d.values)); });
-
-        layers.exit().remove();
+            .attr('d', function (d) { return _safePath(_area(d.values)); });
+        dc.transition(layersExit.select('path.area'), _chart.transitionDuration())
+            .attr('d', function (d) { return _safePath(_areaEnterExit(d.values)); });
 
         // Points
-        var dots = g.selectAll('circle')
-            .data(data, function (datum) {
-                return datum.key + datum.layer || '';
-            });
-        dots.enter()
-            .append('circle')
-            .on('mousemove', function () {
-                d3.select(this)
-                    .attr('r', _dotRadius)
-                    .style('fill-opacity', 0.8)
-                    .style('stroke-opacity', 0.8);
-            })
-            .on('mouseout', function () {
-                d3.select(this)
-                    .attr('r', _dataPointRadius)
-                    .style('fill-opacity', _dataPointFillOpacity)
-                    .style('stroke-opacity', _dataPointStrokeOpacity);
-            })
-            .append('title').text(_chart.title());
-        dc.transition(dots, _chart.transitionDuration())
-            .attr('cx', function (d) { return dc.utils.safeNumber(_chart.x()(d.x)); })
-            .attr('cy', function (d) { return dc.utils.safeNumber(_chart.y()(d.y + d.y0)); })
-            .attr('r', _dataPointRadius)
-            .attr('fill', _chart.getColor)
-            .style('fill-opacity', _dataPointFillOpacity)
-            .style('stroke-opacity', _dataPointStrokeOpacity);
-        dots.exit().remove();
+        layers.each(function (d) {
+            var dots = _g.selectAll('circle.' + d.key)
+                .data(d.values, dc.pluck('key'));
+            dots.enter()
+                .append('circle')
+                .attr('class', d.key)
+                .attr('cx', function (d) { return dc.utils.safeNumber(_x(d.key)); })
+                .attr('cy', function () { return dc.utils.safeNumber(_y(0)); })
+                .on('mousemove', function () {
+                    d3.select(this)
+                        .attr('r', _dotRadius)
+                        .style('fill-opacity', 0.8)
+                        .style('stroke-opacity', 0.8);
+                })
+                .on('mouseout', function () {
+                    d3.select(this)
+                        .attr('r', _dataPointRadius)
+                        .style('fill-opacity', _dataPointFillOpacity)
+                        .style('stroke-opacity', _dataPointStrokeOpacity);
+                })
+                .append('title').text(_chart.title());
+            dc.transition(dots, _chart.transitionDuration())
+                .attr('cx', function (d) { return dc.utils.safeNumber(_x(d.key)); })
+                .attr('cy', function (d) { return dc.utils.safeNumber(_y(d.values0 + d.values)); })
+                .attr('r', _dotRadius)
+                .attr('fill', _chart.getColor)
+                .style('fill-opacity', 0.8)
+                .style('stroke-opacity', 0.8);
+            dots.exit().remove();
+        });
+
+        dc.transition(layersExit, _chart.transitionDuration()).remove();
     };
 
     function colorFilter(color, dashstyle, inv) {
@@ -237,123 +270,33 @@ dc.lineChart = function (parent, chartGroup) {
 
 dc.lineChart.layerFn = {
     standard: dc.layerMixin.layerFunctor(function (chart, data) {
-        var standard = dc.layerMixin.dataFn.standard(chart, data),
-            xAxisExtent = d3.extent(standard, dc.pluck('key'));
+        var xAxisExtent = d3.extent(data, chart.keyAccessor()),
+            yAxisExtent = d3.extent(data, chart.valueAccessor());
         data = dc.layerMixin.dataFn.layer(chart, data);
-        var yAxisExtent = data.reduce(function (extent, datum) {
-            var extentP = d3.extent(datum.values, dc.pluck('values'));
-            return [Math.min(extent[0], extentP[0]), Math.max(extent[1], extentP[1])];
-        }, [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]);
+        data.forEach(function (datum) {
+            datum.values.forEach(function (keyDatum) {
+                keyDatum.values0 = 0;
+            });
+        });
         return {
             data: data,
             xAxisMin: xAxisExtent[0] || 0,
             xAxisMax: xAxisExtent[1] || 0,
-            yAxisMin: yAxisExtent[0] === Number.POSITIVE_INFINITY ? 0 : yAxisExtent[0],
-            yAxisMax: yAxisExtent[1] === Number.NEGATIVE_INFINITY ? 0 : yAxisExtent[1],
-            render: function (chart) {
-                var _x = chart.x(),
-                    _y = chart.y(),
-                    _y0 = _y(0),
-                    _line = d3.svg.line()
-                        .x(function (d) { return _x(d.key); })
-                        .y(function (d) { return _y(d.values); })
-                        .interpolate(chart.interpolate())
-                        .tension(chart.tension()),
-                    _area = d3.svg.area()
-                        .x(function (d) { return _x(d.key); })
-                        .y(function (d) { return _y(d.values); })
-                        .y0(_y0)
-                        .interpolate(chart.interpolate())
-                        .tension(chart.tension());
-                if (chart.defined()) {
-                    _line.defined(chart.defined());
-                    _area.defined(chart.defined());
-                }
-                return {
-                    line: _line,
-                    area: _area
-                };
-            }
+            yAxisMin: yAxisExtent[0] || 0,
+            yAxisMax: yAxisExtent[1] || 0
         };
     }),
     stack: dc.layerMixin.layerFunctor(function (chart, data) {
-        var xAxisExtent = d3.extent(dc.layerMixin.dataFn.standard(chart, data), dc.pluck('key'));
+        var xAxisExtent = d3.extent(data, chart.keyAccessor());
         data = dc.layerMixin.dataFn.layer(chart, data);
-        var keyMap = {};
-        data = data.map(function (datum) {
-            return {
-                key: datum.key,
-                values: datum.values.reduce(function (previous, keyDatum) {
-                    var key = keyDatum.key;
-                    previous.push({
-                        key: keyDatum.key,
-                        values0: keyMap[key] = keyMap[key] || 0,
-                        values1: keyMap[key] += keyDatum.values
-                    });
-                    return previous;
-                }, [])
-            };
-        });
-        var yAxisMax = 0;
-        for (var key in keyMap) {
-            yAxisMax = Math.max(keyMap[key], yAxisMax);
-        }
-        return {
-            data: data,
-            xAxisMin: xAxisExtent[0] || 0,
-            xAxisMax: xAxisExtent[1] || 0,
-            yAxisMin: 0,
-            yAxisMax: yAxisMax || 0,
-            render: function (chart) {
-                var _x = chart.x(),
-                    _y = chart.y(),
-                    _line = d3.svg.line()
-                        .x(function (d) { return _x(d.key); })
-                        .y(function (d) { return _y(d.values1); })
-                        .interpolate(chart.interpolate())
-                        .tension(chart.tension()),
-                    _area = d3.svg.area()
-                        .x(function (d) { return _x(d.key); })
-                        .y(function (d) { return _y(d.values1); })
-                        .y0(function (d) { return _y(d.values0); })
-                        .interpolate(chart.interpolate())
-                        .tension(chart.tension());
-                if (chart.defined()) {
-                    _line.defined(chart.defined());
-                    _area.defined(chart.defined());
-                }
-                return {
-                    line: _line,
-                    area: _area
-                };
-            }
-        };
-    }),
-    stack100: dc.layerMixin.layerFunctor(function (chart, data) {
-        var xAxisExtent = d3.extent(dc.layerMixin.dataFn.standard(chart, data), dc.pluck('key'));
-        data = dc.layerMixin.dataFn.layer(chart, data);
-        var keyMap = {};
-        data = data.map(function (datum) {
-            return {
-                key: datum.key,
-                values: datum.values.reduce(function (previous, keyDatum) {
-                    var key = keyDatum.key;
-                    previous.push({
-                        key: keyDatum.key,
-                        values0: keyMap[key] = keyMap[key] || 0,
-                        values1: keyMap[key] += keyDatum.values
-                    });
-                    return previous;
-                }, [])
-            };
-        });
+        var keyMap = {},
+            yAxisMax = Number.NEGATIVE_INFINITY;
         data.forEach(function (datum) {
-            datum.values.forEach(function (datumValues) {
-                var total = keyMap[datumValues.key];
-                if (total) {
-                    datumValues.values0 /= total;
-                    datumValues.values1 /= total;
-                }
+            datum.values.forEach(function (keyDatum) {
+                var key = keyDatum.key;
+                keyDatum.values0 = keyMap[key] = keyMap[key] || 0;
+                keyDatum.values = keyMap[key] += keyDatum.values;
+                yAxisMax = Math.max(yAxisMax, keyDatum.values);
             });
         });
         return {
@@ -361,88 +304,65 @@ dc.lineChart.layerFn = {
             xAxisMin: xAxisExtent[0] || 0,
             xAxisMax: xAxisExtent[1] || 0,
             yAxisMin: 0,
-            yAxisMax: 1,
-            render: function (chart) {
-                var _x = chart.x(),
-                    _y = chart.y(),
-                    _line = d3.svg.line()
-                        .x(function (d) { return _x(d.key); })
-                        .y(function (d) { return _y(d.values1); })
-                        .interpolate(chart.interpolate())
-                        .tension(chart.tension()),
-                    _area = d3.svg.area()
-                        .x(function (d) { return _x(d.key); })
-                        .y(function (d) { return _y(d.values1); })
-                        .y0(function (d) { return _y(d.values0); })
-                        .interpolate(chart.interpolate())
-                        .tension(chart.tension());
-                if (chart.defined()) {
-                    _line.defined(chart.defined());
-                    _area.defined(chart.defined());
-                }
-                return {
-                    line: _line,
-                    area: _area
-                };
-            }
+            yAxisMax: yAxisMax === Number.NEGATIVE_INFINITY ? 0 : yAxisMax
+        };
+    }),
+    stack100: dc.layerMixin.layerFunctor(function (chart, data) {
+        var keyMap = {},
+            xAxisExtent = d3.extent(data, chart.keyAccessor());
+        data = dc.layerMixin.dataFn.layer(chart, data);
+        data.forEach(function (datum) {
+            datum.values.forEach(function (keyDatum) {
+                var key = keyDatum.key;
+                keyDatum.values0 = keyMap[key] = keyMap[key] || 0;
+                keyDatum.values = keyMap[key] += keyDatum.values;
+            });
+        });
+        data.forEach(function (datum) {
+            datum.values.forEach(function (keyDatum) {
+                var keyTotal = keyMap[keyDatum.key];
+                keyDatum.values0 /= keyTotal;
+                keyDatum.values /= keyTotal;
+            });
+        });
+        return {
+            data: data,
+            xAxisMin: xAxisExtent[0] || 0,
+            xAxisMax: xAxisExtent[1] || 0,
+            yAxisMin: 0,
+            yAxisMax: 1
         };
     }),
     area: dc.layerMixin.layerFunctor(function (chart, data) {
-        var standard = dc.layerMixin.dataFn.standard(chart, data),
-            xAxisExtent = d3.extent(standard, dc.pluck('key'));
+        var xAxisExtent = d3.extent(data, chart.keyAccessor()),
+            yAxisMin = Number.POSITIVE_INFINITY,
+            yAxisMax = Number.NEGATIVE_INFINITY;
         data = dc.layerMixin.dataFn.key(chart, data);
-        var dataAndYAxisExtent = data.reduce(function (previous, datum) {
-                var extent = d3.extent(datum.values, dc.pluck('values'));
-                previous[0].push({
-                    key: datum.key,
-                    values0: extent[1] || 0,
-                    values1: extent[0] || 0
-                });
-                previous[1].push({
-                    key: datum.key,
-                    values0: extent[0] || 0,
-                    values1: extent[1] || 0
-                });
-                previous[2].push({
-                    key: datum.key,
-                    values1: extent[1] || 0 - extent[0] || 0
-                });
-                previous[3] = [Math.min(extent[0], previous[3][0]), Math.max(extent[1], previous[3][1])];
-                return previous;
-            }, [[], [], [], [Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]]);
+        data = data.reduce(function (previous, datum) {
+            var key = datum.key,
+                values = datum.values,
+                extent = d3.extent(values, dc.pluck('values')),
+                mean = d3.mean(values, dc.pluck('values')),
+                median = d3.median(values, dc.pluck('values'));
+            yAxisMin = Math.min(extent[0], yAxisMin);
+            yAxisMax = Math.max(extent[1], yAxisMax);
+            previous[0].values.push({key: key, values0: extent[0] || 0, values: extent[1] || 0});
+            previous[1].values.push({key: key, values0: extent[1] || 0, values: extent[0] || 0});
+            previous[2].values.push({key: key, values0: null, values: mean || 0});
+            previous[3].values.push({key: key, values0: null, values: median || 0});
+            return previous;
+        }, [
+            {key: 'max', values: []},
+            {key: 'min', values: []},
+            {key: 'mean', values: []},
+            {key: 'mean', values: []}
+        ]);
         return {
-            data: [
-                {key: 'max', values: dataAndYAxisExtent[0]},
-                {key: 'min', values: dataAndYAxisExtent[1]},
-                {key: 'mid', values: dataAndYAxisExtent[2]}
-            ],
+            data: data,
             xAxisMin: xAxisExtent[0] || 0,
             xAxisMax: xAxisExtent[1] || 0,
-            yAxisMin: dataAndYAxisExtent[3][0] === Number.POSITIVE_INFINITY ? 0 : dataAndYAxisExtent[3][0],
-            yAxisMax: dataAndYAxisExtent[3][1] === Number.NEGATIVE_INFINITY ? 0 : dataAndYAxisExtent[3][1],
-            render: function (chart) {
-                var _x = chart.x(),
-                    _y = chart.y(),
-                    _line = d3.svg.line()
-                        .x(function (d) { return _x(d.key); })
-                        .y(function (d) { return _y(d.values1); })
-                        .interpolate(chart.interpolate())
-                        .tension(chart.tension()),
-                    _area = d3.svg.area()
-                        .x(function (d) { return _x(d.key); })
-                        .y(function (d) { return _y(d.values1); })
-                        .y0(function (d) { return _y(d.values0); })
-                        .interpolate(chart.interpolate())
-                        .tension(chart.tension());
-                if (chart.defined()) {
-                    _line.defined(chart.defined());
-                    _area.defined(chart.defined());
-                }
-                return {
-                    line: _line,
-                    area: _area
-                };
-            }
+            yAxisMin: yAxisMin === Number.POSITIVE_INFINITY ? 0 : yAxisMin,
+            yAxisMax: yAxisMax === Number.NEGATIVE_INFINITY ? 0 : yAxisMax
         };
     })
 };
