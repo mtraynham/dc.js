@@ -1,18 +1,30 @@
 dc.lineChart = function (parent, chartGroup) {
     var DEFAULT_DOT_RADIUS = 5,
-        DEFAULT_DOT_OPACITY = 1e-6;
+        DEFAULT_DOT_OPACITY = 1;
 
     var _chart = dc.layerMixin(dc.coordinateGridMixin({})),
         _renderArea = false,
         _dotRadius = DEFAULT_DOT_RADIUS,
-        _dataPointRadius = null,
+        _dataPointRadius = DEFAULT_DOT_RADIUS,
         _dataPointFillOpacity = DEFAULT_DOT_OPACITY,
         _dataPointStrokeOpacity = DEFAULT_DOT_OPACITY,
         _interpolate = 'linear',
         _tension = 0.7,
         _defined,
         _dashStyle,
-        _safePath = function (d) { return (!d || d.indexOf('NaN') >= 0) ? 'M0,0' : d; };
+        _safePath = function (d) { return (!d || d.indexOf('NaN') >= 0) ? 'M0,0' : d; },
+        _line = d3.svg.line()
+            .interpolate(_interpolate)
+            .tension(_tension),
+        _lineEnterExit = d3.svg.line()
+            .interpolate(_interpolate)
+            .tension(_tension),
+        _area = d3.svg.area()
+            .interpolate(_interpolate)
+            .tension(_tension),
+        _areaEnterExit = d3.svg.area()
+            .interpolate(_interpolate)
+            .tension(_tension);
 
     _chart.transitionDuration(500);
     _chart._rangeBandPadding(1);
@@ -30,6 +42,10 @@ dc.lineChart = function (parent, chartGroup) {
             return _interpolate;
         }
         _interpolate = _;
+        _line.interpolate(_interpolate);
+        _lineEnterExit.interpolate(_interpolate);
+        _area.interpolate(_interpolate);
+        _areaEnterExit.interpolate(_interpolate);
         return _chart;
     };
 
@@ -45,6 +61,10 @@ dc.lineChart = function (parent, chartGroup) {
             return _tension;
         }
         _tension = _;
+        _line.tension(_tension);
+        _lineEnterExit.tension(_tension);
+        _area.tension(_tension);
+        _areaEnterExit.tension(_tension);
         return _chart;
     };
 
@@ -138,29 +158,21 @@ dc.lineChart = function (parent, chartGroup) {
         var _g = _chart.chartBodyG(),
             _data = _chart.layerFn().data,
             _x = _chart.x(),
-            _y = _chart.y(),
-            _line = d3.svg.line()
-                .x(function (d) { return _x(d.key); })
-                .y(function (d) { return _y(d.values); })
-                .interpolate(_chart.interpolate())
-                .tension(_chart.tension()),
-            _lineEnterExit = d3.svg.line()
-                .x(function (d) { return _x(d.key); })
-                .y(function () { return _y(0); })
-                .interpolate(_chart.interpolate())
-                .tension(_chart.tension()),
-            _area = d3.svg.area()
-                .x(function (d) { return _x(d.key); })
-                .y(function (d) { return _y(d.values); })
-                .y0(function (d) { return _y(d.values0); })
-                .interpolate(_chart.interpolate())
-                .tension(_chart.tension()),
-            _areaEnterExit = d3.svg.area()
-                .x(function (d) { return _x(d.key); })
-                .y(function () { return _y(0); })
-                .y0(function () { return _y(0); })
-                .interpolate(_chart.interpolate())
-                .tension(_chart.tension());
+            _y = _chart.y();
+        _line = d3.svg.line()
+            .x(function (d) { return _x(d.key); })
+            .y(function (d) { return _y(d.values); });
+        _lineEnterExit = d3.svg.line()
+            .x(function (d) { return _x(d.key); })
+            .y(function () { return _y(0); });
+        _area = d3.svg.area()
+            .x(function (d) { return _x(d.key); })
+            .y(function (d) { return _y(d.values); })
+            .y0(function (d) { return _y(d.values0); });
+        _areaEnterExit = d3.svg.area()
+            .x(function (d) { return _x(d.key); })
+            .y(function () { return _y(0); })
+            .y0(function () { return _y(0); });
 
         // Layers
         var layers = _g.selectAll('g.layer')
@@ -196,37 +208,36 @@ dc.lineChart = function (parent, chartGroup) {
             .attr('d', function (d) { return _safePath(_areaEnterExit(d.values)); });
 
         // Points
-        layers.each(function (d) {
-            var dots = _g.selectAll('circle.' + d.key)
-                .data(d.values, dc.pluck('key'));
-            dots.enter()
-                .append('circle')
-                .attr('class', d.key)
-                .attr('cx', function (d) { return dc.utils.safeNumber(_x(d.key)); })
-                .attr('cy', function () { return dc.utils.safeNumber(_y(0)); })
-                .on('mousemove', function () {
-                    d3.select(this)
-                        .attr('r', _dotRadius)
-                        .style('fill-opacity', 0.8)
-                        .style('stroke-opacity', 0.8);
-                })
-                .on('mouseout', function () {
-                    d3.select(this)
-                        .attr('r', _dataPointRadius)
-                        .style('fill-opacity', _dataPointFillOpacity)
-                        .style('stroke-opacity', _dataPointStrokeOpacity);
-                })
-                .append('title').text(_chart.title());
-            dc.transition(dots, _chart.transitionDuration())
-                .attr('cx', function (d) { return dc.utils.safeNumber(_x(d.key)); })
-                .attr('cy', function (d) { return dc.utils.safeNumber(_y(d.values0 + d.values)); })
+        var dots = layers.selectAll('circle')
+            .data(function (d) { return d.values; });
+        dots.enter()
+            .append('circle')
+            .attr('cx', function (d) { return dc.utils.safeNumber(_x(d.key)); })
+            .attr('cy', function () { return dc.utils.safeNumber(_y(0)); })
+            .on('mousemove', function () {
+                d3.select(this)
                 .attr('r', _dotRadius)
-                .attr('fill', _chart.getColor)
                 .style('fill-opacity', 0.8)
                 .style('stroke-opacity', 0.8);
-            dots.exit().remove();
-        });
-
+            })
+            .on('mouseout', function () {
+                d3.select(this)
+                .attr('r', _dataPointRadius)
+                .style('fill-opacity', _dataPointFillOpacity)
+                .style('stroke-opacity', _dataPointStrokeOpacity);
+            })
+            .append('title').text(_chart.title());
+        dc.transition(dots, _chart.transitionDuration())
+            .attr('cx', function (d) { return dc.utils.safeNumber(_x(d.key)); })
+            .attr('cy', function (d) { return dc.utils.safeNumber(_y(d.values)); })
+            .attr('r', _dataPointRadius)
+            .attr('fill', function () { return _chart.getColor(this.parentNode.__data__.key); })
+            .style('fill-opacity', _dataPointFillOpacity)
+            .style('stroke-opacity', _dataPointStrokeOpacity);
+        dc.transition(dots.exit(), _chart.transitionDuration())
+            .attr('cx', function (d) { return dc.utils.safeNumber(_x(d.key)); })
+            .attr('cy', function () { return dc.utils.safeNumber(_y(0)); })
+            .remove();
         dc.transition(layersExit, _chart.transitionDuration()).remove();
     };
 
