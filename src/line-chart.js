@@ -231,7 +231,7 @@ dc.lineChart = function (parent, chartGroup) {
             .attr('cx', function (d) { return dc.utils.safeNumber(_x(d.key)); })
             .attr('cy', function (d) { return dc.utils.safeNumber(_y(d.values)); })
             .attr('r', _dataPointRadius)
-            .attr('fill', function () { return _chart.getColor(this.parentNode.__data__.key); })
+            .attr('fill', function () { return _chart.getColor(this.parentNode.__data__); })
             .style('fill-opacity', _dataPointFillOpacity)
             .style('stroke-opacity', _dataPointStrokeOpacity);
         dc.transition(dots.exit(), _chart.transitionDuration())
