@@ -101,6 +101,63 @@ describe('dc.dataTable', function() {
         });
     });
 
+    describe('specifying chart columns with label', function () {
+        beforeEach(function() {
+            chart.columns(["state"]);
+            chart.render();
+        });
+        it('should render value and capitalized header', function(){
+            var cols = chart.selectAll("td.dc-table-column")[0].map(function(d){return d.textContent;});
+            var expected = ["Mississippi", "Mississippi", "Delaware"];
+            expect(cols.length).toEqual(expected.length);
+            expected.forEach(function(d){
+                expect(cols).toContain(d);
+            });
+            var colheader = chart.selectAll("th.dc-table-head")[0].map(function(d){return d.textContent;});
+            expect(colheader.length).toEqual(1);
+            expect(colheader[0]).toEqual("State");
+
+        });
+    });
+    describe('specifying chart columns with function', function () {
+        beforeEach(function () {
+            chart.columns([function(d){return "" + d.id + 'test';}]);
+            chart.render();
+        });
+        it('should render function result and no header', function(){
+            var cols = chart.selectAll("td.dc-table-column")[0].map(function(d){return d.textContent;});
+            var expected = ["9test", "8test", "3test"];
+            expect(cols.length).toEqual(expected.length);
+            expected.forEach(function(d){
+                expect(cols).toContain(d);
+            });
+            var colheader = chart.selectAll("th.dc-table-head")[0].map(function(d){return d.textContent;});
+            expect(colheader.length).toEqual(0);
+        });
+    });
+    describe('specifying chart columns with object', function () {
+        beforeEach(function() {
+            chart.columns([{
+                label: "Test ID",
+                format: function(d){
+                    return "test" + d.id;
+                }
+            }]);
+            chart.render();
+        });
+        it('should render result of calling function with field and header for label', function(){
+            var cols = chart.selectAll("td.dc-table-column")[0].map(function(d){return d.textContent;});
+            var expected = ["test9", "test8", "test3"];
+            expect(cols.length).toEqual(expected.length);
+            expected.forEach(function(d){
+                expect(cols).toContain(d);
+            });
+            var colheader = chart.selectAll("th.dc-table-head")[0].map(function(d){return d.textContent;});
+            expect(colheader.length).toEqual(1);
+            expect(colheader[0]).toEqual("Test ID");
+        });
+    });
+
     afterEach(function() {
         dimension.filterAll();
         countryDimension.filterAll();
