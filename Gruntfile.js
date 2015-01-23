@@ -2,6 +2,7 @@ module.exports = function (grunt) {
     'use strict';
 
     var jsFiles = module.exports.jsFiles;
+    var webpack = require('webpack');
 
     var output = {
         js: '<%= pkg.name %>.js',
@@ -305,7 +306,79 @@ module.exports = function (grunt) {
                         standalone: 'dc'
                     }
                 }
+            }
+        },
+        tslint: {
+            options: {
+                configuration: grunt.file.readJSON('tslint.json')
             },
+            files: {
+                src: ['src/**/*.ts']
+            }
+        },
+
+        ts: {
+            dist: {
+                src: ['src/**/*.ts'],
+                outDir: './.tmp/ts',
+                options: {
+                    declaration: true,
+                    module: 'commonjs',
+                    compiler: './node_modules/typescript/bin/tsc'
+                }
+            }
+        },
+
+        'dts_bundle': {
+            dist: {
+                options: {
+                    name: 'dc',
+                    main: './.tmp/ts/DC.d.ts',
+                    out: 'dc.d.ts'
+                }
+            }
+        },
+
+        webpack: {
+            options: {
+                progress: false, // freaked on windows
+                failOnError: true,
+                externals: {
+                    'd3': 'd3',
+                    'crossfilter': 'crossfilter'
+                }
+            },
+            debug: {
+                devtool: 'source-map',
+                module: {
+                    preLoaders: [
+                        {
+                            test: /\.js$/,
+                            loader: 'source-map-loader'
+                        }
+                    ]
+                },
+                entry: './.tmp/ts/DC.js',
+                output: {
+                    sourcePrefix: '    ',
+                    library: 'dc',
+                    libraryTarget: 'umd',
+                    path: './',
+                    filename: 'dc-typed.js'
+                }
+            },
+            dist: {
+                entry: './.tmp/ts/DC.js',
+                plugins: [
+                    new webpack.optimize.UglifyJsPlugin()
+                ],
+                output: {
+                    library: 'dc',
+                    libraryTarget: 'umd',
+                    path: './',
+                    filename: 'dc-typed.min.js'
+                }
+            }
         }
     });
 
@@ -327,6 +400,10 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-debug-task');
     grunt.loadNpmTasks('grunt-fileindex');
     grunt.loadNpmTasks('grunt-browserify');
+    grunt.loadNpmTasks('grunt-dts-bundle');
+    grunt.loadNpmTasks('grunt-ts');
+    grunt.loadNpmTasks('grunt-tslint');
+    grunt.loadNpmTasks('grunt-webpack');
 
     // custom tasks
     grunt.registerMultiTask('emu', 'Documentation extraction by emu.', function () {
@@ -387,6 +464,7 @@ module.exports = function (grunt) {
     grunt.registerTask('ci-pull', ['test', 'jasmine:specs:build', 'connect:server']);
     grunt.registerTask('lint', ['build', 'jshint', 'jscs']);
     grunt.registerTask('default', ['build']);
+    grunt.registerTask('typed', ['tslint','ts','dts_bundle','webpack']);
 };
 
 module.exports.jsFiles = [

@@ -1,0 +1,22 @@
+///ts:ref=references
+/// <reference path="../references.ts"/> ///ts:ref:generated
+
+import NumberUtils = require('./NumberUtils');
+
+class Units {
+    public static ordinal(start: number, end: number, domain: Array<any>): Array<any> {
+        return domain;
+    }
+
+    public static integer(start: number, end: number): number {
+        return Math.abs(end - start);
+    }
+
+    public static float(precision: number): (start: number, end: number) => number {
+        return (start: number, end: number): number => {
+            var d = Math.abs((end - start) / precision);
+            return NumberUtils.isNegligible(d - Math.floor(d)) ? Math.floor(d) : Math.ceil(d);
+        };
+    }
+}
+export = Units;
