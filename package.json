@@ -53,6 +53,7 @@
     "grunt-template-jasmine-istanbul": "~0.3.0",
     "marked": "~0.2.10",
     "uglify-js": "2.4.x",
+    "grunt-contrib-clean": "~0.6.0",
     "grunt-dts-bundle": "~0.2.0",
     "grunt-ts": "git://github.com/mtraynham/grunt-ts#bug_187",
     "grunt-tslint": "~1.0.1",

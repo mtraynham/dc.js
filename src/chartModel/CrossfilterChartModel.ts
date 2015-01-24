@@ -1,30 +1,30 @@
-///ts:ref=references
-/// <reference path="../references.ts"/> ///ts:ref:generated
+/// <reference path="../references.ts"/>
 
 import ChartModel = require('./ChartModel');
 import Filter = require('../filters/Filter');
 
-class CrossfilterChartModel<T, TDimension> implements ChartModel {
+class CrossFilterChartModel<T, TDimension> extends ChartModel {
 
     private dimension: CrossFilter.Dimension<T, TDimension>;
     private group: CrossFilter.Group<T, TDimension, TDimension>;
 
     constructor(dimension: CrossFilter.Dimension<T, TDimension>, group: CrossFilter.Group<T, TDimension, TDimension>) {
+        super();
         this.dimension = dimension;
         this.group = group;
     }
 
-    public filter(filters: Array<Filter>): Array<Filter> {
+    public apply(): boolean {
         this.dimension.filter(null);
-        if (filters.length > 0) {
+        if (this.filters.length > 0) {
             this.dimension.filterFunction((value: TDimension) =>
-                filters.some((filter: Filter) => filter.isFiltered(value)));
+                this.filters.some((filter: Filter) => filter.isFiltered(value)));
         }
-        return filters;
+        return true;
     }
 
     public data(): Array<CrossFilter.Grouping<TDimension, TDimension>> {
         return this.group.all();
     }
 }
-export = CrossfilterChartModel;
+export = CrossFilterChartModel;

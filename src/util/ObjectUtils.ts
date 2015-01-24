@@ -3,6 +3,7 @@
 
 import DateUtils = require('./DateUtils');
 import NumberUtils = require('./NumberUtils');
+import Accessor = require('./Accessor');
 
 class ObjectUtils {
     public static toString(value: any): string {
@@ -17,9 +18,8 @@ class ObjectUtils {
         return s;
     }
 
-    public static pluck(key: string, fn?: (obj: any, value: any, index: number) =>
-                            (obj: any, index: number) => any): (d: any, index?: number) => any {
-        return fn ? (d: any, index: number) => fn.call(d, d[key], index) : (d: any) => d[key];
+    public static pluck<T>(key: string, fn?: (object: T, value: any, index: number) => any) : Accessor<T> {
+        return fn ? (d: T, index: number) => fn.call(d, d[key], index) : (d: T) => d[key];
     }
 }
 export = ObjectUtils;

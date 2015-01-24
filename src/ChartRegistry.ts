@@ -1,32 +1,32 @@
 ///ts:ref=references
 /// <reference path="./references.ts"/> ///ts:ref:generated
 
-import BaseChart = require('./chart/BaseChart');
+import Chart = require('./chart/Chart');
 
 class ChartRegistry {
     private static DEFAULT_GROUP: string = '__default_chart_group__';
 
-    private groups: {[group: string]: Array<BaseChart>} = {};
+    private groups: {[group: string]: Array<Chart>} = {};
 
     public hasGroup(group: string): boolean {
         return this.groups.hasOwnProperty(group);
     }
 
-    public hasChart(chart: BaseChart): boolean {
+    public hasChart(chart: Chart): boolean {
         return Object.keys(this.groups).some((key: string) => this.groups[key].indexOf(chart) > -1);
     }
 
-    public groupHasChart(group: string, chart: BaseChart): boolean {
+    public groupHasChart(group: string, chart: Chart): boolean {
         return this.hasGroup(group) && this.groups[group].indexOf(chart) > -1;
     }
 
-    public register(chart: BaseChart, group: string): number {
+    public register(chart: Chart, group: string): number {
         var charts = this.groups[this.initGroup(group)];
         return charts.indexOf(chart) < 0 ? charts.push(chart) : -1;
     }
 
-    public deregister(chart: BaseChart, group?: string): void {
-        var remove: (chart: BaseChart, group: string) => void = (chart: BaseChart, group: string) => {
+    public deregister(chart: Chart, group?: string): void {
+        var remove: (chart: Chart, group: string) => void = (chart: Chart, group: string) => {
             var index = this.groups[group].indexOf(chart);
             return index > -1 ? this.groups[group].splice(index, 1) : this.groups[group];
         };
@@ -46,7 +46,7 @@ class ChartRegistry {
         }
     }
 
-    public list(group: string): Array<BaseChart> {
+    public list(group: string): Array<Chart> {
         return this.groups[this.initGroup(group)];
     }
 

@@ -1,15 +1,11 @@
-///ts:ref=references
-/// <reference path="../references.ts"/> ///ts:ref:generated
+/// <reference path="../references.ts"/>
 
-interface Accessor {
-    (obj: any): any;
-}
-
+import Chart = require('./Chart');
 import ChartModel = require('../chartModel/ChartModel');
 import Filter = require('./../filters/ValueFilter');
 
-class BaseChart {
-    private model: ChartModel;
+class BaseChart implements Chart {
+    public chartModel: ChartModel;
 
     private anchor: string;
     private root: D3.Selection;
@@ -29,7 +25,6 @@ class BaseChart {
         'zoomed',
         'renderlet'
     );
-    private filters: Array<Filter>;
 
     private static DEFAULT_WIDTH(minWidth: number, element: Element): number {
         var width = element && element.getBoundingClientRect && <number> element.getBoundingClientRect().width;
@@ -41,16 +36,8 @@ class BaseChart {
         return (width && width > minHeight) ? width : minHeight;
     }
 
-    constructor(model: ChartModel) {
-        this.model = model;
-    }
-
-    public filterAll(): void {
-        var x: number = 5;
-    }
-
-    public focus(): void {
-        var x: number = 5;
+    constructor(chartModel: ChartModel) {
+        this.chartModel = chartModel;
     }
 
     public render(): void {

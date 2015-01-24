@@ -308,6 +308,13 @@ module.exports = function (grunt) {
                 }
             }
         },
+
+        clean: {
+            typed: {
+                src: ['.tmp']
+            }
+        },
+
         tslint: {
             options: {
                 configuration: grunt.file.readJSON('tslint.json')
@@ -333,8 +340,8 @@ module.exports = function (grunt) {
             dist: {
                 options: {
                     name: 'dc',
-                    main: './.tmp/ts/DC.d.ts',
-                    out: 'dc.d.ts'
+                    main: '.tmp/ts/DC.d.ts',
+                    out: './dc.d.ts'
                 }
             }
         },
@@ -400,6 +407,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-debug-task');
     grunt.loadNpmTasks('grunt-fileindex');
     grunt.loadNpmTasks('grunt-browserify');
+    grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-dts-bundle');
     grunt.loadNpmTasks('grunt-ts');
     grunt.loadNpmTasks('grunt-tslint');
@@ -464,7 +472,7 @@ module.exports = function (grunt) {
     grunt.registerTask('ci-pull', ['test', 'jasmine:specs:build', 'connect:server']);
     grunt.registerTask('lint', ['build', 'jshint', 'jscs']);
     grunt.registerTask('default', ['build']);
-    grunt.registerTask('typed', ['tslint','ts','dts_bundle','webpack']);
+    grunt.registerTask('typed', ['clean', 'tslint', 'ts', 'dts_bundle', 'webpack']);
 };
 
 module.exports.jsFiles = [
