@@ -39,3 +39,4 @@ web/docs/public
 # typescript
 .tmp
 .tscache
+src/.baseDir.ts
