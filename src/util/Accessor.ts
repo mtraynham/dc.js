@@ -1,5 +1,4 @@
-///ts:ref=references
-/// <reference path="../references.ts"/> ///ts:ref:generated
+/// <reference path="../references.ts"/>
 
 interface Accessor<T> {
     (object: T, index?: number): any;

@@ -1,4 +1,3 @@
-///ts:ref=references
 /// <reference path="./references.ts"/> ///ts:ref:generated
 
 import Chart = require('./chart/Chart');

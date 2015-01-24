@@ -1,5 +1,4 @@
-///ts:ref=references
-/// <reference path="../references.ts"/> ///ts:ref:generated
+/// <reference path="../references.ts"/>
 
 class NumberUtils {
     public static NEGLIGIBLE_NUMBER: number = 1e-10;
