@@ -1,6 +1,6 @@
 /// <reference path="../references.ts"/>
 
-import ChartView = require('./ChartView');
+import ChartView = require('./../chartView/ChartView');
 import ChartModel = require('../chartModel/ChartModel');
 import Accessor = require('../util/Accessor');
 
@@ -22,9 +22,10 @@ class Chart {
     }
 
     public render(): Chart {
+        this.chartView.clearSvg();
         this.listeners['preRender'](this);
         this.listeners['renderlet'](this);
-        this.doRender();
+        this.doRedraw(this.chartView.svg);
         this.listeners['postRender'](this);
         return this;
     }
@@ -32,16 +33,16 @@ class Chart {
     public redraw(): Chart {
         this.listeners['preRedraw'](this);
         this.listeners['renderlet'](this);
-        this.doRedraw();
+        this.doRedraw(this.chartView.svg);
         this.listeners['postRedraw'](this);
         return this;
     }
 
-    protected doRender(): Chart {
+    protected doRender(svg: D3.Selection): Chart {
         return this;
     }
 
-    protected doRedraw(): Chart {
+    protected doRedraw(svg: D3.Selection): Chart {
         return this;
     }
 }

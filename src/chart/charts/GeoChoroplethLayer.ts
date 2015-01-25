@@ -3,14 +3,14 @@
 import Accessor = require('../../util/Accessor');
 
 class GeoChoroplethLayer {
-    public feature: any;
     public name: string;
+    public feature: any;
     public keyAccessor: Accessor<any, any>;
     public titleAccessor: Accessor<any, string>;
 
-    constructor(feature: any, name: string, keyAccessor: Accessor<any, any>, titleAccessor: Accessor<any, string>) {
-        this.feature = feature;
+    constructor(name: string, feature: any, keyAccessor: Accessor<any, any>, titleAccessor: Accessor<any, string>) {
         this.name = name;
+        this.feature = feature;
         this.keyAccessor = keyAccessor;
         this.titleAccessor = titleAccessor;
     }

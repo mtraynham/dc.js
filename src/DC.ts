@@ -6,7 +6,7 @@ import ChartRegistry = require('./ChartRegistry');
 export var chartRegistry = new ChartRegistry();
 
 export import Chart = require('./chart/Chart');
-export import ChartView = require('./chart/ChartView');
+export import ChartView = require('./chartView/ChartView');
 export import Focusable = require('./chart/Focusable');
 
 export import GeoChoropleth = require('./chart/charts/GeoChoropleth');
