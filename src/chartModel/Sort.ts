@@ -14,7 +14,7 @@ class Sort {
 
     public sort(data: Array<any>): Array<any> {
         data = this.sort(data, 0, data.length);
-        return this.sortDirection == SortDirection.DESC ? data.reverse() : data;
+        return this.sortDirection === SortDirection.DESC ? data.reverse() : data;
     }
 }
 
