@@ -8,8 +8,17 @@ import Accessor = require('../util/Accessor');
 
 class BaseChart implements Chart {
     public chartModel: ChartModel;
-    public colorScale: ColorScale;
     public keyAccessor: Accessor<any>;
+
+    public listeners: D3.Dispatch = d3.dispatch(
+        'preRender',
+        'postRender',
+        'preRedraw',
+        'postRedraw',
+        'filtered',
+        'zoomed',
+        'renderlet'
+    );
 
     private anchor: string;
     private root: D3.Selection;
@@ -19,16 +28,6 @@ class BaseChart implements Chart {
     private minHeight: number = 200;
     private height: (minHeight: number, element: Element) => number = BaseChart.DEFAULT_HEIGHT;
     private width: (minHeight: number, element: Element) => number = BaseChart.DEFAULT_WIDTH;
-
-    private listeners: D3.Dispatch = d3.dispatch(
-        'preRender',
-        'postRender',
-        'preRedraw',
-        'postRedraw',
-        'filtered',
-        'zoomed',
-        'renderlet'
-    );
 
     private static DEFAULT_WIDTH(minWidth: number, element: Element): number {
         var width = element && element.getBoundingClientRect && <number> element.getBoundingClientRect().width;
@@ -44,12 +43,28 @@ class BaseChart implements Chart {
         this.chartModel = chartModel;
     }
 
-    public render(): void {
-        var x: number = 5;
+    public render(): Chart {
+        this.listeners['preRender'](this);
+        this.listeners['renderlet'](this);
+        this.doRender();
+        this.listeners['postRender'](this);
+        return this;
     }
 
-    public redraw(): void {
-        var x: number = 5;
+    public redraw(): Chart {
+        this.listeners['preRedraw'](this);
+        this.listeners['renderlet'](this);
+        this.doRedraw();
+        this.listeners['postRedraw'](this);
+        return this;
+    }
+
+    protected doRender(): Chart {
+        return this;
+    }
+
+    protected doRedraw(): Chart {
+        return this;
     }
 }
 export = BaseChart;

@@ -8,8 +8,8 @@ interface Chart {
     keyAccessor: Accessor<any>;
     valueAccessor?: Accessor<any>;
     layerAccessor?: Accessor<any>;
-    render(): void;
-    redraw(): void;
+    render(): Chart;
+    redraw(): Chart;
 }
 
 export = Chart;

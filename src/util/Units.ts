@@ -3,10 +3,6 @@
 import NumberUtils = require('./NumberUtils');
 
 class Units {
-    public static ordinal(start: number, end: number, domain: Array<any>): Array<any> {
-        return domain;
-    }
-
     public static integer(start: number, end: number): number {
         return Math.abs(end - start);
     }

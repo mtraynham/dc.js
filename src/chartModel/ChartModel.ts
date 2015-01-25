@@ -1,9 +1,11 @@
 /// <reference path="../references.ts"/>
 
 import Filter = require('../filters/Filter');
+import Sort = require('./Sort');
 
 class ChartModel {
-    public filters: Array<Filter> = new Array<Filter>();
+    public filters: Array<Filter> = [];
+    public sort: Sort;
 
     public hasFilter(filter: Filter): boolean {
         return this.filters.indexOf(filter) > -1;
@@ -23,7 +25,7 @@ class ChartModel {
     }
 
     public clearFilters(): ChartModel {
-        this.filters = new Array<Filter>();
+        this.filters = [];
         return this;
     }
 
@@ -48,7 +50,7 @@ class ChartModel {
 
     // abstract
     public data(): Array<any> {
-        return new Array<any>();
+        return [];
     }
 }
 export = ChartModel;

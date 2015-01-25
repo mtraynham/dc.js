@@ -28,14 +28,16 @@ class ChartRegistry {
     }
 
     public deregister(chart: Chart, group?: string): ChartRegistry {
-        var remove: (chart: Chart, group: string) => void = (chart: Chart, group: string) => {
+        var remove: (group: string) => void = (group: string) => {
             var index = this.groups[group].indexOf(chart);
-            return index > -1 ? this.groups[group].splice(index, 1) : this.groups[group];
+            if (index > -1) {
+                this.groups[group].splice(index, 1);
+            }
         };
         if (group) {
-            remove(chart, group);
+            remove(group);
         } else {
-            Object.keys(this.groups).forEach((key: string) => remove(chart, key));
+            Object.keys(this.groups).forEach(remove);
         }
         return this;
     }
@@ -53,13 +55,8 @@ class ChartRegistry {
         return this.groups[this.initGroup(group)];
     }
 
-    private initGroup(group: string): string {
-        if (!group) {
-            group = ChartRegistry.DEFAULT_GROUP;
-        }
-        if (!this.groups[group]) {
-            this.groups[group] = [];
-        }
+    private initGroup(group: string = ChartRegistry.DEFAULT_GROUP): string {
+        this.groups[group] = this.groups[group] || [];
         return group;
     }
 }
