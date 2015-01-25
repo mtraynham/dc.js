@@ -5,7 +5,8 @@ class NumberUtils {
     public static FLOAT_FORMAT: (value: number) => string = d3.format('.2f');
 
     public static isNumber(n: any): boolean {
-        return n === +n;
+        return typeof n === 'number' ||
+            (n && typeof n === 'object' && Object.prototype.toString.call(n) === '[object Number]');
     }
 
     public static isFloat(n: any): boolean {
@@ -20,11 +21,11 @@ class NumberUtils {
         return !NumberUtils.isNumber(n) || (n < NumberUtils.NEGLIGIBLE_NUMBER && n > -NumberUtils.NEGLIGIBLE_NUMBER);
     }
 
-    public static safeNumber(n: number) {
-        return NumberUtils.isNumber(n) ? n : 0;
+    public static safeNumber(n: number, def: number = 0) {
+        return NumberUtils.isNumber(n) ? n : def;
     }
 
-    public static clamp(n: number, min: number, max: number): number {
+    public static clamp(n: number, min: number = Number.MIN_VALUE, max: number = Number.MAX_VALUE): number {
         return Math.max(Math.min(n, max), min);
     }
 }

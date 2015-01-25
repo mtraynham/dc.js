@@ -4,10 +4,10 @@ import Chart = require('./Chart');
 import Accessor = require('../util/Accessor');
 
 class ColorScale {
-    public colorAccessor: Accessor<any>;
+    public colorAccessor: Accessor<any, any>;
     public colors: D3.Scale.GenericScale<any>;
 
-    constructor (colorAccessor: Accessor<any>, colors: D3.Scale.GenericScale<any> = d3.scale.category20c()) {
+    constructor (colorAccessor: Accessor<any, any>, colors: D3.Scale.GenericScale<any> = d3.scale.category20c()) {
         this.colorAccessor = colorAccessor;
         this.colors = colors;
     }

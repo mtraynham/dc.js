@@ -17,7 +17,7 @@ class ObjectUtils {
         return s;
     }
 
-    public static pluck<T>(key: string, fn?: (datum: T, value: any, index: number) => any) : Accessor<T> {
+    public static pluck<T, R>(key: string, fn?: (datum: T, value: any, index: number) => R) : Accessor<T, R> {
         return fn ? (datum: T, index: number) => fn.call(datum, datum[key], index) : (datum: T) => datum[key];
     }
 }

@@ -1,7 +1,7 @@
 /// <reference path="../references.ts"/>
 
-interface Accessor<T> {
-    (datum: T, index?: number): any;
+interface Accessor<T, R> {
+    (datum: T, index?: number): R;
 }
 
 export = Accessor;

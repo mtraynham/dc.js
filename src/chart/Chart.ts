@@ -1,9 +1,11 @@
 /// <reference path="../references.ts"/>
 
+import ChartView = require('./ChartView');
 import ChartModel = require('../chartModel/ChartModel');
 import Accessor = require('../util/Accessor');
 
 class Chart {
+    public chartView: ChartView;
     public chartModel: ChartModel;
 
     public listeners: D3.Dispatch = d3.dispatch(
@@ -14,7 +16,8 @@ class Chart {
         'renderlet'
     );
 
-    constructor(chartModel: ChartModel) {
+    constructor(chartView: ChartView, chartModel: ChartModel) {
+        this.chartView = chartView;
         this.chartModel = chartModel;
     }
 
