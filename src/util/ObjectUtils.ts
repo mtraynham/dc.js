@@ -1,8 +1,8 @@
 /// <reference path="../references.ts"/>
 
+import Accessor = require('./Accessor');
 import DateUtils = require('./DateUtils');
 import NumberUtils = require('./NumberUtils');
-import Accessor = require('./Accessor');
 
 class ObjectUtils {
     public static toString(value: any): string {
@@ -17,8 +17,8 @@ class ObjectUtils {
         return s;
     }
 
-    public static pluck<T>(key: string, fn?: (object: T, value: any, index: number) => any) : Accessor<T> {
-        return fn ? (d: T, index: number) => fn.call(d, d[key], index) : (d: T) => d[key];
+    public static pluck<T>(key: string, fn?: (datum: T, value: any, index: number) => any) : Accessor<T> {
+        return fn ? (datum: T, index: number) => fn.call(datum, datum[key], index) : (datum: T) => datum[key];
     }
 }
 export = ObjectUtils;

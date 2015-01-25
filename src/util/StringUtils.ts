@@ -9,5 +9,9 @@ class StringUtils {
     public static nameToId(name: string): string {
         return name.toLowerCase().replace(/[\s]/g, '_').replace(/[\.']/g, '');
     }
+
+    public static arrayToString(array: Array<any>) {
+        return array.map((datum: any) => datum.toString()).join(', ');
+    }
 }
 export = StringUtils;

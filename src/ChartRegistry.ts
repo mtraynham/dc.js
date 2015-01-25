@@ -19,12 +19,15 @@ class ChartRegistry {
         return this.hasGroup(group) && this.groups[group].indexOf(chart) > -1;
     }
 
-    public register(chart: Chart, group: string): number {
+    public register(chart: Chart, group: string): ChartRegistry {
         var charts = this.groups[this.initGroup(group)];
-        return charts.indexOf(chart) < 0 ? charts.push(chart) : -1;
+        if (charts.indexOf(chart) < 0) {
+            charts.push(chart);
+        }
+        return this;
     }
 
-    public deregister(chart: Chart, group?: string): void {
+    public deregister(chart: Chart, group?: string): ChartRegistry {
         var remove: (chart: Chart, group: string) => void = (chart: Chart, group: string) => {
             var index = this.groups[group].indexOf(chart);
             return index > -1 ? this.groups[group].splice(index, 1) : this.groups[group];
@@ -34,15 +37,16 @@ class ChartRegistry {
         } else {
             Object.keys(this.groups).forEach((key: string) => remove(chart, key));
         }
-
+        return this;
     }
 
-    public clear(group?: string): void {
+    public clear(group?: string): ChartRegistry {
         if (group) {
             delete this.groups[group];
         } else {
             this.groups = {};
         }
+        return this;
     }
 
     public list(group: string): Array<Chart> {

@@ -1,11 +1,11 @@
 /// <reference path="../references.ts"/>
 
 import ValueFilter = require('./ValueFilter');
-import NDimensionalFilter = require('./NDimensionalFilter');
+import ArrayFilter = require('./ArrayFilter');
 
-class NDimensionalValueFilter extends NDimensionalFilter<ValueFilter> {
+class ValueArrayFilter extends ArrayFilter<ValueFilter> {
     constructor(values: Array<any>) {
         super(values.map((value: any) => new ValueFilter(value)));
     }
 }
-export = NDimensionalValueFilter;
+export = ValueArrayFilter;

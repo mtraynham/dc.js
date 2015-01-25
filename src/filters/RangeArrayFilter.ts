@@ -2,11 +2,11 @@
 
 import Range = require('./Range');
 import RangeFilter = require('./RangeFilter');
-import NDimensionalFilter = require('./NDimensionalFilter');
+import ArrayFilter = require('./ArrayFilter');
 
-class NDimensionalRangeFilter extends NDimensionalFilter<RangeFilter> {
+class RangeArrayFilter extends ArrayFilter<RangeFilter> {
     constructor(values: Array<Range>) {
         super(values.map((value: Range) => new RangeFilter(value)));
     }
 }
-export = NDimensionalRangeFilter;
+export = RangeArrayFilter;

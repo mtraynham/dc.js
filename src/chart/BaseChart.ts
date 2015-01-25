@@ -2,10 +2,14 @@
 
 import Chart = require('./Chart');
 import ChartModel = require('../chartModel/ChartModel');
+import ColorScale = require('./ColorScale');
 import Filter = require('./../filters/ValueFilter');
+import Accessor = require('../util/Accessor');
 
 class BaseChart implements Chart {
     public chartModel: ChartModel;
+    public colorScale: ColorScale;
+    public keyAccessor: Accessor<any>;
 
     private anchor: string;
     private root: D3.Selection;

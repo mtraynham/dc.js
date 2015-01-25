@@ -15,13 +15,12 @@ export import CrossFilterChartModel = require('./chartModel/CrossFilterChartMode
 export import Exception = require('./error/Exception');
 export import InvalidStateException = require('./error/InvalidStateException');
 
+export import ArrayFilter = require('./filters/ArrayFilter');
 export import Filter = require('./filters/Filter');
-export import FilterPrinter = require('./filters/FilterPrinter');
-export import NDimensionalFilter = require('./filters/NDimensionalFilter');
-export import NDimensionalRangeFilter = require('./filters/NDimensionalRangeFilter');
-export import NDimensionalValueFilter = require('./filters/NDimensionalValueFilter');
 export import Range = require('./filters/Range');
+export import RangeArrayFilter = require('./filters/RangeArrayFilter');
 export import RangeFilter = require('./filters/RangeFilter');
+export import ValueArrayFilter = require('./filters/ValueArrayFilter');
 export import ValueFilter = require('./filters/ValueFilter');
 
 export import Accessor = require('./util/Accessor');

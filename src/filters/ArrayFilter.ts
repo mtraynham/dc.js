@@ -2,7 +2,7 @@
 
 import Filter = require('./Filter');
 
-class NDimensionalFilter<T extends Filter> implements Filter {
+class ArrayFilter<T extends Filter> implements Filter {
     public filters: Array<T>;
 
     constructor(filters: Array<T>) {
@@ -18,4 +18,4 @@ class NDimensionalFilter<T extends Filter> implements Filter {
         return this.filters.map((filter: T) => filter.toString()).join(', ');
     }
 }
-export = NDimensionalFilter;
+export = ArrayFilter;

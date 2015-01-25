@@ -9,21 +9,25 @@ class ChartModel {
         return this.filters.indexOf(filter) > -1;
     }
 
-    public addFilter(filter: Filter): Array<Filter> {
+    public addFilter(filter: Filter): ChartModel {
         this.filters.push(filter);
-        return this.filters;
+        return this;
     }
 
-    public removeFilter(filter: Filter): Array<Filter> {
+    public removeFilter(filter: Filter): ChartModel {
         var index: number = this.filters.indexOf(filter);
-        return index > -1 ? this.filters.splice(index, 1) : this.filters;
+        if (index > -1) {
+            this.filters.splice(index, 1);
+        }
+        return this;
     }
 
-    public clearFilters(): void {
+    public clearFilters(): ChartModel {
         this.filters = new Array<Filter>();
+        return this;
     }
 
-    public filter(filter?: Filter): Array<Filter> {
+    public filter(filter?: Filter): ChartModel {
         if (arguments.length) {
             if (!filter) {
                 this.clearFilters();
@@ -34,12 +38,12 @@ class ChartModel {
             }
             this.apply();
         }
-        return this.filters;
+        return this;
     }
 
     // abstract
-    public apply(): boolean {
-        return false;
+    public apply(): ChartModel {
+        return this;
     }
 
     // abstract
