@@ -6,19 +6,7 @@ import ColorScale = require('./ColorScale');
 import Filter = require('./../filters/ValueFilter');
 import Accessor = require('../util/Accessor');
 
-class BaseChart implements Chart {
-    public chartModel: ChartModel;
-    public keyAccessor: Accessor<any>;
-
-    public listeners: D3.Dispatch = d3.dispatch(
-        'preRender',
-        'postRender',
-        'preRedraw',
-        'postRedraw',
-        'filtered',
-        'zoomed',
-        'renderlet'
-    );
+class BaseChart extends Chart {
 
     private anchor: string;
     private root: D3.Selection;
@@ -40,31 +28,7 @@ class BaseChart implements Chart {
     }
 
     constructor(chartModel: ChartModel) {
-        this.chartModel = chartModel;
-    }
-
-    public render(): Chart {
-        this.listeners['preRender'](this);
-        this.listeners['renderlet'](this);
-        this.doRender();
-        this.listeners['postRender'](this);
-        return this;
-    }
-
-    public redraw(): Chart {
-        this.listeners['preRedraw'](this);
-        this.listeners['renderlet'](this);
-        this.doRedraw();
-        this.listeners['postRedraw'](this);
-        return this;
-    }
-
-    protected doRender(): Chart {
-        return this;
-    }
-
-    protected doRedraw(): Chart {
-        return this;
+        super(chartModel);
     }
 }
 export = BaseChart;

@@ -4,17 +4,20 @@ import SortDirection = require('./SortDirection');
 import Accessor = require('../util/Accessor');
 
 class Sort {
-    public sort: CrossFilter.Sort<any>;
+    public sortAccessor: Accessor<any>;
     public sortDirection: SortDirection;
+    public asc: (a: any, b: any) => number;
+    public desc: (a: any, b: any) => number;
 
-    constructor(sortAccessor: CrossFilter.Selector<any>, sortDirection?: SortDirection = SortDirection.ASC) {
-        this.sort = crossfilter.quicksort.by(sortAccessor);
+    constructor(sortAccessor: Accessor<any>, sortDirection: SortDirection = SortDirection.ASC) {
+        this.sortAccessor = sortAccessor;
         this.sortDirection = sortDirection;
+        this.asc = (a: any, b: any) => this.sortAccessor(a) >= this.sortAccessor(b) ? -1 : 1;
+        this.desc = (a: any, b: any) => this.sortAccessor(a) >= this.sortAccessor(b) ? 1 : -1;
     }
 
-    public sort(data: Array<any>): Array<any> {
-        data = this.sort(data, 0, data.length);
-        return this.sortDirection === SortDirection.DESC ? data.reverse() : data;
+    public apply(data: Array<any>): Array<any> {
+        return this.sortDirection === SortDirection.DESC ? data.sort(this.desc) : data.sort(this.asc);
     }
 }
 
