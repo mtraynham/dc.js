@@ -22,10 +22,9 @@ class Chart {
     }
 
     public render(): Chart {
-        this.chartView.clearSvg();
         this.listeners['preRender'](this);
         this.listeners['renderlet'](this);
-        this.doRedraw(this.chartView.svg);
+        this.doRedraw(this.chartView.svg(true));
         this.listeners['postRender'](this);
         return this;
     }
@@ -33,7 +32,7 @@ class Chart {
     public redraw(): Chart {
         this.listeners['preRedraw'](this);
         this.listeners['renderlet'](this);
-        this.doRedraw(this.chartView.svg);
+        this.doRedraw(this.chartView.svg());
         this.listeners['postRedraw'](this);
         return this;
     }

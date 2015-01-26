@@ -22,7 +22,6 @@ class ChartView {
         }
         this._anchor = anchor;
         this._root = d3.select(anchor);
-        this.clearSvg();
     }
 
     public get anchor(): string {
@@ -33,14 +32,14 @@ class ChartView {
         return this._root;
     }
 
-    public get svg(): D3.Selection {
+    public svg(clear: boolean = false): D3.Selection {
+        if (clear) {
+            this._svg.remove();
+            this._svg = this.root.append('svg');
+        }
         return this._svg
             .attr('width', this.width)
             .attr('height', this.height);
-    }
-
-    public clearSvg(): D3.Selection {
-        return this._svg = this._root.append('svg');
     }
 
     public get width(): number {
