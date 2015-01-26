@@ -11,22 +11,22 @@ class ChartModel {
         return this.filters.indexOf(filter) > -1;
     }
 
-    public addFilter(filter: Filter): ChartModel {
-        this.filters.push(filter);
-        return this;
+    public addFilter(filter: Filter): number {
+        return this.filters.push(filter);
     }
 
-    public removeFilter(filter: Filter): ChartModel {
+    public removeFilter(filter: Filter): Filter {
         var index: number = this.filters.indexOf(filter);
         if (index > -1) {
             this.filters.splice(index, 1);
         }
-        return this;
+        return filter;
     }
 
-    public clearFilters(): ChartModel {
+    public clearFilters(): Array<Filter> {
+        var tmp: Array<Filter> = this.filters;
         this.filters = [];
-        return this;
+        return tmp;
     }
 
     public filter(filter?: Filter): ChartModel {

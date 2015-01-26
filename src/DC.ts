@@ -6,13 +6,18 @@ import ChartRegistry = require('./ChartRegistry');
 export var chartRegistry = new ChartRegistry();
 
 export import Chart = require('./chart/Chart');
-export import ChartView = require('./chartView/ChartView');
 export import Focusable = require('./chart/Focusable');
 
-export import GeoChoropleth = require('./chart/charts/GeoChoropleth');
+export import GeoChoropleth = require('./chart/charts/geoChoropleth/GeoChoropleth');
+
+export import ChartView = require('./chartView/ChartView');
+export import MarginChartView = require('./chartView/MarginChartView');
+export import Margins = require('./chartView/Margins');
 
 export import ChartModel = require('./chartModel/ChartModel');
 export import CrossFilterChartModel = require('./chartModel/CrossFilterChartModel');
+export import Sort = require('./chartModel/Sort');
+export import SortDirection = require('./chartModel/SortDirection');
 
 export import Exception = require('./error/Exception');
 export import InvalidStateException = require('./error/InvalidStateException');

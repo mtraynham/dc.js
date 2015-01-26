@@ -1,9 +1,9 @@
-/// <reference path="../../references.ts"/>
+/// <reference path="../../../references.ts"/>
 
 import GeoChoroplethLayer = require('./GeoChoroplethLayer');
-import Chart = require('../Chart');
-import ChartView = require('../../chartView/ChartView');
-import ChartModel = require('../../chartModel/ChartModel');
+import Chart = require('../../Chart');
+import ChartView = require('../../../chartView/ChartView');
+import ChartModel = require('../../../chartModel/ChartModel');
 
 class GeoChoropleth extends Chart {
     public layers: {[index: string]: GeoChoroplethLayer} = {};

@@ -37,10 +37,12 @@ class Chart {
         return this;
     }
 
+    // abstract
     protected doRender(svg: D3.Selection): Chart {
         return this;
     }
 
+    // abstract
     protected doRedraw(svg: D3.Selection): Chart {
         return this;
     }

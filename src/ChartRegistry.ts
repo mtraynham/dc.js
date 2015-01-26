@@ -11,23 +11,24 @@ class ChartRegistry {
         return this.groups.hasOwnProperty(group);
     }
 
-    public hasChart(chart: Chart): boolean {
-        return Object.keys(this.groups).some((key: string) => this.groups[key].indexOf(chart) > -1);
+    public hasChart(chart: Chart, group?: string): boolean {
+        return group ? this.hasGroup(group) && this.groups[group].indexOf(chart) > -1 :
+            Object.keys(this.groups).some((key: string) => this.groups[key].indexOf(chart) > -1);
     }
 
-    public groupHasChart(group: string, chart: Chart): boolean {
-        return this.hasGroup(group) && this.groups[group].indexOf(chart) > -1;
+    public list(group?: string): Array<Chart> {
+        return group ? this.groups[this.initGroup(group)] :
+            Object.keys(this.groups).reduce((prev: Array<Chart>, key: string) =>
+                prev.concat(this.groups[key]), []);
     }
 
-    public register(chart: Chart, group: string): ChartRegistry {
+    public add(chart: Chart, group?: string): number {
         var charts = this.groups[this.initGroup(group)];
-        if (charts.indexOf(chart) < 0) {
-            charts.push(chart);
-        }
-        return this;
+        var index: number = charts.indexOf(chart);
+        return index < 0 ? charts.push(chart) : index;
     }
 
-    public deregister(chart: Chart, group?: string): ChartRegistry {
+    public remove(chart: Chart, group?: string): Chart {
         var remove: (group: string) => void = (group: string) => {
             var index = this.groups[group].indexOf(chart);
             if (index > -1) {
@@ -39,20 +40,17 @@ class ChartRegistry {
         } else {
             Object.keys(this.groups).forEach(remove);
         }
-        return this;
+        return chart;
     }
 
-    public clear(group?: string): ChartRegistry {
+    public clear(group?: string): Array<Chart> {
+        var charts: Array<Chart> = this.list(group);
         if (group) {
             delete this.groups[group];
         } else {
             this.groups = {};
         }
-        return this;
-    }
-
-    public list(group: string): Array<Chart> {
-        return this.groups[this.initGroup(group)];
+        return charts;
     }
 
     private initGroup(group: string = ChartRegistry.DEFAULT_GROUP): string {

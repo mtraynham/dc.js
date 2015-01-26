@@ -1,6 +1,6 @@
-/// <reference path="../../references.ts"/>
+/// <reference path="../../../references.ts"/>
 
-import Accessor = require('../../util/Accessor');
+import Accessor = require('../../../util/Accessor');
 
 class GeoChoroplethLayer {
     public name: string;
