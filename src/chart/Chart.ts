@@ -29,7 +29,7 @@ class Chart {
     public render(): Chart {
         this.listeners['preRender'](this);
         this.listeners['renderlet'](this);
-        this.doRedraw(this.chartView.svg(true), this.chartModel.data());
+        this.doRender(this.chartView.svg(true), this.chartModel.data());
         this.listeners['postRender'](this);
         return this;
     }

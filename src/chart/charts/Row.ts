@@ -11,21 +11,24 @@ class Row extends Chart {
     public labelOffsetX: number = 10;
     public labelOffsetY: number = 0;
     public gap: number = 0.05;
+    public xAxis: D3.Svg.Axis = d3.svg.axis();
 
     private x: D3.Scale.LinearScale = d3.scale.linear();
-    private xAxis: D3.Svg.Axis = d3.svg.axis().scale(this.x);
     private y: D3.Scale.OrdinalScale = d3.scale.ordinal();
     private dyOffset = '0.35em';
 
+    constructor(chartView: ChartView, chartModel: ChartModel) {
+        super(chartView, chartModel);
+        this.xAxis = this.xAxis.scale(this.x);
+    }
+
     protected doRedraw(svg: D3.Selection, data: Array<any>): Chart {
         var layeredData: Array<any> = data.reduce((all: Array<any>, layer: any) => all.concat(layer.values), []);
-        var domain: Array<any> = d3.set(layeredData.map((d: any) => d.x)).values();
+        var domain: Array<any> = d3.set(layeredData.map((data: any) => data.x)).values();
 
-        this.x
-            .domain(d3.extent(layeredData.map((d: any) => d.y0 + d.y1).concat[0]))
+        this.x.domain(d3.extent(layeredData.map((data: any) => data.y0 + data.y1).concat[0]))
             .range([0, this.chartView.width()]);
-        this.y
-            .domain(domain)
+        this.y.domain(domain)
             .rangeBands([0, this.chartView.height()]);
 
         var axisG: D3.Selection = svg.select('g.axis');
@@ -37,10 +40,10 @@ class Row extends Chart {
         axisG.call(this.xAxis);
 
         var ticks: D3.Selection = svg.selectAll('g.tick');
-        ticks.select('line.grid-line').remove();
-        ticks.append('line')
-            .attr('class', 'grid-line')
-            .attr('y2', -this.chartView.height());
+        if (ticks.selectAll('line.grid-line').empty()) {
+            ticks.append('line').attr('class', 'grid-line')
+                .attr('y2', -this.chartView.height());
+        }
 
         var rows: D3.UpdateSelection = svg.selectAll('rect.' + Row.ROW_CSS_CLASS)
             .data(layeredData);
@@ -48,31 +51,34 @@ class Row extends Chart {
             .attr('width', 0)
             .attr('x', 0)
             .attr('fill', 'white')
-            .attr('class', (d: any, i: number) => Row.ROW_CSS_CLASS + ' _' + i);
-        rows.on('click', (d: any) => this.chartModel.filter(d.x))
-            .classed('deselected', (d: any) => this.chartModel.hasFilter() ? !this.chartModel.hasFilter(d.x) : false)
-            .classed('deselected', (d: any) => this.chartModel.hasFilter() ? this.chartModel.hasFilter(d.x) : false);
-        rows.attr('y', (d: any) => this.y(d.x))
+            .attr('class', (data: any, index: number) => Row.ROW_CSS_CLASS + ' _' + index);
+        rows.on('click', (data: any) => this.chartModel.filter(data.x))
+            .classed('deselected', (data: any) => this.chartModel.hasFilter() ? !this.chartModel.hasFilter(data.x) : false)
+            .classed('selected', (data: any) => this.chartModel.hasFilter() ? this.chartModel.hasFilter(data.x) : false);
+        rows.attr('y', (data: any) => this.y(data.x))
             .attr('height', this.y.rangeBand())
-            .attr('x', (d: any) => this.x(d.y0))
-            .attr('width', (d: any) => this.x(d.y));
+            .attr('x', (data: any) => this.x(data.y0))
+            .attr('width', (data: any) => this.x(data.y));
         rows.exit().remove();
 
-        rows.selectAll('title').remove();
         if (this.renderTitle) {
-            rows.append('title').text(this.titleFn);
+            if (rows.selectAll('title').empty()) {
+                rows.append('title').text(this.titleFn);
+            }
+        } else {
+            rows.selectAll('title').remove();
         }
 
         var labels: D3.UpdateSelection = svg.selectAll('text.' + Row.ROW_CSS_CLASS)
             .data(domain);
         labels.enter().append('text')
-            .attr('class', (d: any, i: number) => Row.ROW_CSS_CLASS + ' _' + i);
-        labels.on('click', (d: any) => this.chartModel.filter(d.x));
-        labels.attr('y', (d: any) => this.y(d) + this.y.rangeBand() / 2)
+            .attr('class', (data: any, index: number) => Row.ROW_CSS_CLASS + ' _' + index);
+        labels.on('click', (data: any) => this.chartModel.filter(data.x));
+        labels.attr('y', (data: any) => this.y(data) + this.y.rangeBand() / 2)
             .attr('x', this.labelOffsetX)
             .attr('dy', this.dyOffset)
             .text(this.labelFn)
-            .on('click', (d: any) => this.chartModel.filter(d.x));
+            .on('click', (data: any) => this.chartModel.filter(data.x));
         labels.exit().remove();
         return this;
     }
