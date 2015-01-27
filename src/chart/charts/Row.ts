@@ -12,8 +12,6 @@ class Row extends Chart {
     public labelOffsetY: number = 0;
     public gap: number = 0.05;
 
-    public renderTitle: boolean = true;
-
     private x: D3.Scale.LinearScale = d3.scale.linear();
     private xAxis: D3.Svg.Axis = d3.svg.axis().scale(this.x);
     private y: D3.Scale.OrdinalScale = d3.scale.ordinal();
@@ -38,7 +36,7 @@ class Row extends Chart {
         }
         axisG.call(this.xAxis);
 
-        var ticks = svg.selectAll('g.tick');
+        var ticks: D3.Selection = svg.selectAll('g.tick');
         ticks.select('line.grid-line').remove();
         ticks.append('line')
             .attr('class', 'grid-line')
@@ -62,17 +60,18 @@ class Row extends Chart {
 
         rows.selectAll('title').remove();
         if (this.renderTitle) {
-            rows.append('title');
+            rows.append('title').text(this.titleFn);
         }
 
-        var labels: D3.UpdateSelection = svg.selectAll('text.' + Row.ROW_CSS_CLASS).data(domain);
+        var labels: D3.UpdateSelection = svg.selectAll('text.' + Row.ROW_CSS_CLASS)
+            .data(domain);
         labels.enter().append('text')
             .attr('class', (d: any, i: number) => Row.ROW_CSS_CLASS + ' _' + i);
         labels.on('click', (d: any) => this.chartModel.filter(d.x));
         labels.attr('y', (d: any) => this.y(d) + this.y.rangeBand() / 2)
             .attr('x', this.labelOffsetX)
             .attr('dy', this.dyOffset)
-            .text((d: any) => d)
+            .text(this.labelFn)
             .on('click', (d: any) => this.chartModel.filter(d.x));
         labels.exit().remove();
         return this;

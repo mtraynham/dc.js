@@ -8,6 +8,11 @@ class Chart {
     public chartView: ChartView;
     public chartModel: ChartModel;
 
+    public renderTitle: boolean = true;
+    public titleFn: Accessor<any, string>;
+    public renderLabel: boolean = true;
+    public labelFn: Accessor<any, string>
+
     public listeners: D3.Dispatch = d3.dispatch(
         'preRender',
         'postRender',
