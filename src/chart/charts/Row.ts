@@ -1,7 +1,7 @@
 /// <reference path="../../references.ts"/>
 
 import Chart = require('../Chart');
-import ChartView = require('../../chartView/ChartView');
+import ChartView = require('../ChartView');
 import ChartModel = require('../../chartModel/ChartModel');
 import Accessor = require('../../util/Accessor');
 
@@ -41,7 +41,8 @@ class Row extends Chart {
 
         var ticks: D3.Selection = svg.selectAll('g.tick');
         if (ticks.selectAll('line.grid-line').empty()) {
-            ticks.append('line').attr('class', 'grid-line')
+            ticks.append('line')
+                .attr('class', (data: number) => data ? 'grid-line' : '') // don't set css for 0 grid line
                 .attr('y2', -this.chartView.height());
         }
 
@@ -58,7 +59,7 @@ class Row extends Chart {
         rows.attr('y', (data: any) => this.y(data.x))
             .attr('height', this.y.rangeBand())
             .attr('x', (data: any) => this.x(data.y0))
-            .attr('width', (data: any) => this.x(data.y));
+            .attr('width', (data: any) => this.x(Math.abs(data.y) + data.y0) + this.x(data.data.y0));
         rows.exit().remove();
 
         if (this.renderTitle) {

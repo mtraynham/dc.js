@@ -1,6 +1,6 @@
 /// <reference path="../references.ts"/>
 
-import ChartView = require('../chartView/ChartView');
+import ChartView = require('ChartView');
 import ChartModel = require('../chartModel/ChartModel');
 import Accessor = require('../util/Accessor');
 
@@ -11,7 +11,7 @@ class Chart {
     public renderTitle: boolean = true;
     public titleFn: Accessor<any, string>;
     public renderLabel: boolean = true;
-    public labelFn: Accessor<any, string>
+    public labelFn: Accessor<any, string>;
 
     public listeners: D3.Dispatch = d3.dispatch(
         'preRender',

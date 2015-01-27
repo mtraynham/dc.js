@@ -2,7 +2,7 @@
 
 import GeoChoroplethLayer = require('./GeoChoroplethLayer');
 import Chart = require('../../Chart');
-import ChartView = require('../../../chartView/ChartView');
+import ChartView = require('../../ChartView');
 import ChartModel = require('../../../chartModel/ChartModel');
 
 class GeoChoropleth extends Chart {

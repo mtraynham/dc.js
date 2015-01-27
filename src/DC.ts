@@ -10,12 +10,12 @@ export import Focusable = require('./chart/Focusable');
 
 export import GeoChoropleth = require('./chart/charts/geoChoropleth/GeoChoropleth');
 
-export import ChartView = require('./chartView/ChartView');
-export import MarginChartView = require('./chartView/MarginChartView');
-export import Margins = require('./chartView/Margins');
+export import ChartView = require('./chart/ChartView');
+export import MarginChartView = require('./chart/chartView/MarginChartView');
+export import Margins = require('./chart/chartView/Margins');
 
 export import ChartModel = require('./chartModel/ChartModel');
-export import CrossFilterChartModel = require('./chartModel/CrossFilterChartModel');
+export import CrossFilterChartModel = require('./chartModel/models/CrossFilterChartModel');
 export import Sort = require('./chartModel/Sort');
 export import SortDirection = require('./chartModel/SortDirection');
 

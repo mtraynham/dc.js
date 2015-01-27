@@ -1,6 +1,6 @@
-/// <reference path="../references.ts"/>
+/// <reference path="../../references.ts"/>
 
-import ChartView = require('./ChartView');
+import ChartView = require('../ChartView');
 import Margins = require('./Margins');
 
 class MarginChartView extends ChartView {

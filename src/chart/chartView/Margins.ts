@@ -1,3 +1,5 @@
+/// <reference path="../../references.ts"/>
+
 class Margins {
     public top: number;
     public right: number;
