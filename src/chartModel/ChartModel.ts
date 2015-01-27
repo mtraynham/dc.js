@@ -7,8 +7,8 @@ class ChartModel {
     public filters: Array<Filter> = [];
     public sort: Sort;
 
-    public hasFilter(filter: Filter): boolean {
-        return this.filters.indexOf(filter) > -1;
+    public hasFilter(filter?: Filter): boolean {
+        return arguments.length ? this.filters.indexOf(filter) > -1 : this.filters.length > 0;
     }
 
     public addFilter(filter: Filter): number {

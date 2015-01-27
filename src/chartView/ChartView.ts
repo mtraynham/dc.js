@@ -42,12 +42,12 @@ class ChartView {
             .attr('height', this.height);
     }
 
-    public get width(): number {
+    public width(): number {
         return this._root ?
             NumberUtils.clamp(this._root.node().getBoundingClientRect().width, this.minWidth, this.maxWidth) : 0;
     }
 
-    public get height(): number {
+    public height(): number {
         return this._root ?
             NumberUtils.clamp(this._root.node().getBoundingClientRect().height, this.minHeight, this.maxHeight) : 0;
     }
