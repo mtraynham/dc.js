@@ -44,12 +44,12 @@ class Chart {
 
     // abstract
     protected doRender(svg: D3.Selection, data: Array<any>): Chart {
-        return this.doRedraw(svg, data);
+        throw new Error('Method is abstract.');
     }
 
     // abstract
     protected doRedraw(svg: D3.Selection, data: Array<any>): Chart {
-        return this;
+        throw new Error('Method is abstract.');
     }
 }
 

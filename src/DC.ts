@@ -1,7 +1,5 @@
 /// <reference path="./references.ts"/>
 
-export var VERSION: string = '%VERSION%';
-
 import ChartRegistry = require('./ChartRegistry');
 export var chartRegistry = new ChartRegistry();
 
