@@ -2,8 +2,8 @@
 
 class GeoChoroplethZoom {
 
-    private static RADIANS = Math.PI / 180;
-    private static DEGREES = 180 / Math.PI;
+    private static RADIANS: number = Math.PI / 180;
+    private static DEGREES: number = 180 / Math.PI;
 
     public projection: D3.Geo.Projection;
     public zoomPoint: number[];
@@ -13,7 +13,6 @@ class GeoChoroplethZoom {
             return;
         }
         var mouse: number[] = d3.mouse(this);
-        var rotate: number[] = GeoChoroplethZoom.quaternionFromEuler(this.projection.rotate());
         var point: number[] = GeoChoroplethZoom.position(this.projection, mouse);
         if (point) {
             this.zoomPoint = point;
@@ -21,16 +20,16 @@ class GeoChoroplethZoom {
     });
 
     private static cartesian(spherical: number[]): number[] {
-        var λ = spherical[0] * GeoChoroplethZoom.RADIANS;
-        var φ = spherical[1] * GeoChoroplethZoom.RADIANS;
-        var cosφ = Math.cos(φ);
+        var λ: number = spherical[0] * GeoChoroplethZoom.RADIANS;
+        var φ: number = spherical[1] * GeoChoroplethZoom.RADIANS;
+        var cosφ: number = Math.cos(φ);
         return [cosφ * Math.cos(λ), cosφ * Math.sin(λ), Math.sin(φ)];
     }
 
     private static dot(a: number[], b: number[]): number {
         var n: number = a.length;
         var s: number = 0;
-        for (var i = 0; i < n; ++i) {
+        for (var i: number = 0; i < n; ++i) {
             s += a[i] * b[i];
         }
         return s;
@@ -56,12 +55,12 @@ class GeoChoroplethZoom {
     }
 
     private static quaternionFromEuler(euler: number[]): number[] {
-        var λ = 0.5 * euler[0] * GeoChoroplethZoom.RADIANS,
-            φ = 0.5 * euler[1] * GeoChoroplethZoom.RADIANS,
-            γ = 0.5 * euler[2] * GeoChoroplethZoom.RADIANS,
-            sinλ = Math.sin(λ), cosλ = Math.cos(λ),
-            sinφ = Math.sin(φ), cosφ = Math.cos(φ),
-            sinγ = Math.sin(γ), cosγ = Math.cos(γ);
+        var λ: number = 0.5 * euler[0] * GeoChoroplethZoom.RADIANS,
+            φ: number = 0.5 * euler[1] * GeoChoroplethZoom.RADIANS,
+            γ: number = 0.5 * euler[2] * GeoChoroplethZoom.RADIANS,
+            sinλ: number = Math.sin(λ), cosλ: number = Math.cos(λ),
+            sinφ: number = Math.sin(φ), cosφ: number = Math.cos(φ),
+            sinγ: number = Math.sin(γ), cosγ: number = Math.cos(γ);
         return [
             cosλ * cosφ * cosγ + sinλ * sinφ * sinγ,
             sinλ * cosφ * cosγ - cosλ * sinφ * sinγ,
@@ -71,8 +70,8 @@ class GeoChoroplethZoom {
     }
 
     private static multiple(a: number[], b: number[]): number[] {
-        var a0 = a[0], a1 = a[1], a2 = a[2], a3 = a[3],
-            b0 = b[0], b1 = b[1], b2 = b[2], b3 = b[3];
+        var a0: number = a[0], a1: number = a[1], a2: number = a[2], a3: number = a[3],
+            b0: number = b[0], b1: number = b[1], b2: number = b[2], b3: number = b[3];
         return [
             a0 * b0 - a1 * b1 - a2 * b2 - a3 * b3,
             a0 * b1 + a1 * b0 + a2 * b3 - a3 * b2,
@@ -85,10 +84,10 @@ class GeoChoroplethZoom {
         if (!a || !b) {
             return null;
         }
-        var axis = GeoChoroplethZoom.cross(a, b),
-            norm = Math.sqrt(GeoChoroplethZoom.dot(axis, axis)),
-            halfγ = 0.5 * Math.acos(Math.max(-1, Math.min(1, GeoChoroplethZoom.dot(a, b)))),
-            k = Math.sin(halfγ) / norm;
+        var axis: number[] = GeoChoroplethZoom.cross(a, b),
+            norm: number = Math.sqrt(GeoChoroplethZoom.dot(axis, axis)),
+            halfγ: number = 0.5 * Math.acos(Math.max(-1, Math.min(1, GeoChoroplethZoom.dot(a, b)))),
+            k: number = Math.sin(halfγ) / norm;
         return norm && [Math.cos(halfγ), axis[2] * k, -axis[1] * k, axis[0] * k];
     }
 

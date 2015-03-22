@@ -1,7 +1,8 @@
 /// <reference path="../references.ts"/>
 
 class StringUtils {
-    private static _idCounter = 0;
+    private static _idCounter: number = 0;
+
     public static uniqueId(): string {
         return (++StringUtils._idCounter).toString();
     }

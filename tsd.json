@@ -6,10 +6,10 @@
   "bundle": "typings/tsd.d.ts",
   "installed": {
     "d3/d3.d.ts": {
-      "commit": "20e56f1f30cb6b9249df06184fc04ba9c3c63340"
+      "commit": "95ce1d9e8212be19d36aa8ccecb48303cc5c87f9"
     },
     "crossfilter/crossfilter.d.ts": {
-      "commit": "20e56f1f30cb6b9249df06184fc04ba9c3c63340"
+      "commit": "95ce1d9e8212be19d36aa8ccecb48303cc5c87f9"
     }
   }
 }

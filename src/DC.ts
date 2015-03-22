@@ -1,7 +1,7 @@
 /// <reference path="./references.ts"/>
 
 import ChartRegistry = require('./ChartRegistry');
-export var chartRegistry = new ChartRegistry();
+export var chartRegistry: ChartRegistry = new ChartRegistry();
 
 export import Chart = require('./chart/Chart');
 export import Focusable = require('./chart/Focusable');

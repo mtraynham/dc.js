@@ -3,10 +3,9 @@
 import Chart = require('../Chart');
 import ChartView = require('../ChartView');
 import ChartModel = require('../../chartModel/ChartModel');
-import Accessor = require('../../util/Accessor');
 
 class Row extends Chart {
-    private static ROW_CSS_CLASS = 'row';
+    private static ROW_CSS_CLASS: string = 'row';
 
     public labelOffsetX: number = 10;
     public labelOffsetY: number = 0;
@@ -15,7 +14,7 @@ class Row extends Chart {
 
     private x: D3.Scale.LinearScale = d3.scale.linear();
     private y: D3.Scale.OrdinalScale = d3.scale.ordinal();
-    private dyOffset = '0.35em';
+    private dyOffset: string = '0.35em';
 
     constructor(chartView: ChartView, chartModel: ChartModel) {
         super(chartView, chartModel);

@@ -20,8 +20,8 @@ class ChartView {
         if (this._anchor) {
             this._root.remove();
         }
-        this._anchor = anchor;
         this._root = d3.select(anchor);
+        this._anchor = anchor;
     }
 
     public get anchor(): string {
@@ -34,13 +34,19 @@ class ChartView {
 
     public get width(): number {
         return this._root ?
-            NumberUtils.clamp(this._root.node().getBoundingClientRect().width, this.minWidth, this.maxWidth) :
+            NumberUtils.clamp(
+                this._root.node().getBoundingClientRect().width,
+                Math.min(this.minWidth, 0),
+                this.maxWidth) :
             0;
     }
 
     public get height(): number {
         return this._root ?
-            NumberUtils.clamp(this._root.node().getBoundingClientRect().height, this.minHeight, this.maxHeight) :
+            NumberUtils.clamp(
+                this._root.node().getBoundingClientRect().height,
+                Math.min(this.minHeight, 0),
+                this.maxHeight) :
             0;
     }
 

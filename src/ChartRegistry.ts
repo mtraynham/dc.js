@@ -23,14 +23,14 @@ class ChartRegistry {
     }
 
     public add(chart: Chart, group?: string): number {
-        var charts = this.groups[this.initGroup(group)];
+        var charts: Array<Chart> = this.groups[this.initGroup(group)];
         var index: number = charts.indexOf(chart);
         return index < 0 ? charts.push(chart) : index;
     }
 
     public remove(chart: Chart, group?: string): Chart {
         var remove: (group: string) => void = (group: string) => {
-            var index = this.groups[group].indexOf(chart);
+            var index: number = this.groups[group].indexOf(chart);
             if (index > -1) {
                 this.groups[group].splice(index, 1);
             }

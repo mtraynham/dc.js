@@ -2,25 +2,25 @@
 
 import ChartModel = require('../ChartModel');
 import Filter = require('../../filters/Filter');
-import Accessor = require('../../util/Accessor');
 
 class CrossFilterChartModel<T, TDimension, R> extends ChartModel {
 
     private dimension: CrossFilter.Dimension<T, TDimension>;
     private group: CrossFilter.Group<TDimension, T, R>;
 
-    constructor(dimension: CrossFilter.Dimension<T, TDimension>, group: CrossFilter.Group<TDimension, T, R>,
-                keyAccessor?: Accessor<any, any>, valueAccessor?: Accessor<any, any>) {
-        super(keyAccessor, valueAccessor);
+    constructor(dimension: CrossFilter.Dimension<T, TDimension>,
+                group: CrossFilter.Group<TDimension, T, R>) {
+        super();
         this.dimension = dimension;
         this.group = group;
     }
 
     public apply(): ChartModel {
-        this.dimension.filter(null);
-        if (this.filters.length > 0) {
+        if (this.filters && this.filters.length > 0) {
             this.dimension.filterFunction((value: TDimension) =>
                 this.filters.some((filter: Filter) => filter.isFiltered(value)));
+        } else {
+            this.dimension.filter(null);
         }
         return this;
     }

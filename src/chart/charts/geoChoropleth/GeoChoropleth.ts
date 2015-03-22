@@ -2,8 +2,6 @@
 
 import GeoChoroplethLayer = require('./GeoChoroplethLayer');
 import Chart = require('../../Chart');
-import ChartView = require('../../ChartView');
-import ChartModel = require('../../../chartModel/ChartModel');
 
 class GeoChoropleth extends Chart {
     public layers: {[index: string]: GeoChoroplethLayer} = {};
@@ -17,6 +15,10 @@ class GeoChoropleth extends Chart {
     private _path: D3.Geo.Path = d3.geo.path();
     private _projection: D3.Geo.Projection = d3.geo.mercator();
     private _projectionChanged: boolean = false;
+
+    public get allFeature(): any {
+        return this._allFeatures;
+    }
 
     public set projection(projection: D3.Geo.Projection) {
         this._projection = projection;

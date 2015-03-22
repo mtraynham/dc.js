@@ -1,6 +1,5 @@
 /// <reference path="../references.ts"/>
 
-import Chart = require('./Chart');
 import Accessor = require('../util/Accessor');
 
 class ColorScale {
