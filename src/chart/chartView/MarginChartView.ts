@@ -1,5 +1,3 @@
-/// <reference path="../../references.ts"/>
-
 import ChartView = require('../ChartView');
 import Margins = require('./Margins');
 

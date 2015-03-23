@@ -1,5 +1,3 @@
-/// <reference path="../references.ts"/>
-
 import Accessor = require('./Accessor');
 import DateUtils = require('./DateUtils');
 import NumberUtils = require('./NumberUtils');

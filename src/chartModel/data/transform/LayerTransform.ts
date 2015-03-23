@@ -1,5 +1,3 @@
-/// <reference path="../../references.ts"/>
-
 import DataTransform = require('../DataTransform');
 import Accessor = require('../../util/Accessor');
 

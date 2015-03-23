@@ -1,5 +1,3 @@
-/// <reference path="../references.ts"/>
-
 import Range = require('./Range');
 import RangeFilter = require('./RangeFilter');
 import ArrayFilter = require('./ArrayFilter');

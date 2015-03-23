@@ -1,5 +1,3 @@
-/// <reference path="../../references.ts"/>
-
 import LayerTransform = require('./LayerTransform');
 import Accessor = require('../../util/Accessor');
 
@@ -11,7 +9,7 @@ class LayerLayerTransform implements LayerTransform {
         this.layerAccessor = layerAccessor;
     }
 
-    public transform(data: Array<any>, keyAccessor: Accessor<any, any>, valueAccessor: Accessor<any, number>): Array<any> {
+    public transform(data: Array<Tuple>, keyAccessor: Accessor<any, any>, valueAccessor: Accessor<any, number>): Array<any> {
         return d3.nest()
             .key((data: any, index: number) => this.layerAccessor(data))
             .key((data: any, index: number) => keyAccessor(data))

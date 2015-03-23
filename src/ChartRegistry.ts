@@ -1,44 +1,42 @@
-/// <reference path="./references.ts"/>
-
 import Chart = require('./chart/Chart');
 
 class ChartRegistry {
     private static DEFAULT_GROUP: string = '__default_chart_group__';
 
-    private groups: {[group: string]: Array<Chart>} = {};
+    private _groups: {[group: string]: Array<Chart>} = {};
 
     public hasGroup(group: string): boolean {
-        return this.groups.hasOwnProperty(group);
+        return (<Object> this._groups).hasOwnProperty(group);
     }
 
     public hasChart(chart: Chart, group?: string): boolean {
-        return group ? this.hasGroup(group) && this.groups[group].indexOf(chart) > -1 :
-            Object.keys(this.groups).some((key: string) => this.groups[key].indexOf(chart) > -1);
+        return group ? this.hasGroup(group) && this._groups[group].indexOf(chart) > -1 :
+            Object.keys(this._groups).some((key: string) => this._groups[key].indexOf(chart) > -1);
     }
 
     public list(group?: string): Array<Chart> {
-        return group ? this.groups[this.initGroup(group)] :
-            Object.keys(this.groups).reduce((prev: Array<Chart>, key: string) =>
-                prev.concat(this.groups[key]), []);
+        return group ? this._groups[this.initGroup(group)] :
+            Object.keys(this._groups).reduce((prev: Array<Chart>, key: string) =>
+                prev.concat(this._groups[key]), []);
     }
 
     public add(chart: Chart, group?: string): number {
-        var charts: Array<Chart> = this.groups[this.initGroup(group)];
+        var charts: Array<Chart> = this._groups[this.initGroup(group)];
         var index: number = charts.indexOf(chart);
         return index < 0 ? charts.push(chart) : index;
     }
 
     public remove(chart: Chart, group?: string): Chart {
         var remove: (group: string) => void = (group: string) => {
-            var index: number = this.groups[group].indexOf(chart);
+            var index: number = this._groups[group].indexOf(chart);
             if (index > -1) {
-                this.groups[group].splice(index, 1);
+                this._groups[group].splice(index, 1);
             }
         };
         if (group) {
             remove(group);
         } else {
-            Object.keys(this.groups).forEach(remove);
+            Object.keys(this._groups).forEach(remove);
         }
         return chart;
     }
@@ -46,15 +44,15 @@ class ChartRegistry {
     public clear(group?: string): Array<Chart> {
         var charts: Array<Chart> = this.list(group);
         if (group) {
-            delete this.groups[group];
+            delete this._groups[group];
         } else {
-            this.groups = {};
+            this._groups = {};
         }
         return charts;
     }
 
     private initGroup(group: string = ChartRegistry.DEFAULT_GROUP): string {
-        this.groups[group] = this.groups[group] || [];
+        this._groups[group] = this._groups[group] || [];
         return group;
     }
 }

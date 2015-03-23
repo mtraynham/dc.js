@@ -1,5 +1,3 @@
-/// <reference path="../references.ts"/>
-
 import SortDirection = require('./SortDirection');
 import Accessor = require('../util/Accessor');
 

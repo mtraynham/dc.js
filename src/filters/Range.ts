@@ -1,5 +1,3 @@
-/// <reference path="../references.ts"/>
-
 class Range {
     public low: any;
     public high: any;

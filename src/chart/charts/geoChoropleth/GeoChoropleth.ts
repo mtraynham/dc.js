@@ -1,5 +1,3 @@
-/// <reference path="../../../references.ts"/>
-
 import GeoChoroplethLayer = require('./GeoChoroplethLayer');
 import Chart = require('../../Chart');
 

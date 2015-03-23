@@ -1,5 +1,3 @@
-/// <reference path="../../references.ts"/>
-
 import LayerTransform = require('./LayerTransform');
 import Accessor = require('../../util/Accessor');
 

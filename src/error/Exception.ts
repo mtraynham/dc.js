@@ -1,5 +1,3 @@
-/// <reference path="../references.ts"/>
-
 class Exception {
     private static DEFAULT_MESSAGE: string = 'Unexpected internal error';
 

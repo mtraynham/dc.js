@@ -1,5 +1,3 @@
-/// <reference path="../references.ts"/>
-
 class StringUtils {
     private static _idCounter: number = 0;
 

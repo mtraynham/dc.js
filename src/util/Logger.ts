@@ -1,5 +1,3 @@
-/// <reference path="../references.ts"/>
-
 class Logger {
     private enableDebugLog: boolean;
 

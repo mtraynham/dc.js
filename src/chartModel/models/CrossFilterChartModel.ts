@@ -1,5 +1,3 @@
-/// <reference path="../../references.ts"/>
-
 import ChartModel = require('../ChartModel');
 import Filter = require('../../filters/Filter');
 
@@ -16,16 +14,16 @@ class CrossFilterChartModel<T, TDimension, R> extends ChartModel {
     }
 
     public apply(): ChartModel {
-        if (this.filters && this.filters.length > 0) {
+        if (this._filters && this._filters.length > 0) {
             this.dimension.filterFunction((value: TDimension) =>
-                this.filters.some((filter: Filter) => filter.isFiltered(value)));
+                this._filters.some((filter: Filter) => filter.isFiltered(value)));
         } else {
             this.dimension.filter(null);
         }
         return this;
     }
 
-    public compute(): Array<CrossFilter.Grouping<T, R>> {
+    public data(): Array<CrossFilter.Grouping<T, R>> {
         return this.group.all();
     }
 }

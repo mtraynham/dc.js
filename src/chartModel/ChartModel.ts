@@ -1,30 +1,32 @@
-/// <reference path="../references.ts"/>
-
 import Filter = require('../filters/Filter');
+import Transform = require('./data/Transform');
 
 class ChartModel {
 
+    protected _filters: Array<Filter> = [];
+    protected _sort:
+
     public hasFilter(filter?: Filter): boolean {
         return arguments.length ?
-            this.filters.indexOf(filter) > -1 :
-            this.filters.length > 0;
+            this._filters.indexOf(filter) > -1 :
+            this._filters.length > 0;
     }
 
     public addFilter(filter: Filter): number {
-        return this.filters.push(filter);
+        return this._filters.push(filter);
     }
 
     public removeFilter(filter: Filter): Filter {
-        var index: number = this.filters.indexOf(filter);
+        var index: number = this._filters.indexOf(filter);
         if (index > -1) {
-            this.filters.splice(index, 1);
+            this._filters.splice(index, 1);
         }
         return filter;
     }
 
     public clearFilters(): Array<Filter> {
-        var tmp: Array<Filter> = this.filters;
-        this.filters = [];
+        var tmp: Array<Filter> = this._filters;
+        this._filters = [];
         return tmp;
     }
 
@@ -46,7 +48,7 @@ class ChartModel {
         throw new Error('This method is abstract.');
     }
 
-    public compute(): Array<any> {
+    public data(): Array<any> {
         throw new Error('This method is abstract.');
     }
 }

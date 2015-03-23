@@ -1,5 +1,3 @@
-/// <reference path="../references.ts"/>
-
 import Filter = require('./Filter');
 
 class ArrayFilter<T extends Filter> implements Filter {

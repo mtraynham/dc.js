@@ -1,5 +1,3 @@
-/// <reference path="../../../references.ts"/>
-
 class GeoChoroplethZoom {
 
     private static RADIANS: number = Math.PI / 180;

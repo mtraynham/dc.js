@@ -1,5 +1,3 @@
-/// <reference path="../references.ts"/>
-
 class NumberUtils {
     public static NEGLIGIBLE_NUMBER: number = 1e-10;
     public static FLOAT_FORMAT: (value: number) => string = d3.format('.2f');

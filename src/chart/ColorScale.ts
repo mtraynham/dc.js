@@ -1,5 +1,3 @@
-/// <reference path="../references.ts"/>
-
 import Accessor = require('../util/Accessor');
 
 class ColorScale {

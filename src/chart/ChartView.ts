@@ -1,5 +1,3 @@
-/// <reference path="../references.ts"/>
-
 import NumberUtils = require('../util/NumberUtils');
 
 class ChartView {

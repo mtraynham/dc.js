@@ -1,5 +1,3 @@
-/// <reference path="./references.ts"/>
-
 import ChartRegistry = require('./ChartRegistry');
 export var chartRegistry: ChartRegistry = new ChartRegistry();
 

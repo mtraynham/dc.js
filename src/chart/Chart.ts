@@ -1,5 +1,3 @@
-/// <reference path="../references.ts"/>
-
 import ChartView = require('ChartView');
 import ChartModel = require('../chartModel/ChartModel');
 import Accessor = require('../util/Accessor');
