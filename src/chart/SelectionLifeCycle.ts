@@ -1,4 +1,5 @@
 import SelectionProvider = require('./SelectionProvider');
+import properties = require('../Properties');
 
 class SelectionLifeCycle {
 
@@ -21,9 +22,18 @@ class SelectionLifeCycle {
     );
 
     private _selectionProvider: SelectionProvider;
+    private _transitionDuration: number;
 
     constructor(selectionProvider: SelectionProvider) {
         this._selectionProvider = selectionProvider;
+    }
+
+    public get transitionDuration(): number {
+        return this._transitionDuration || properties.transitionDuration;
+    }
+
+    public set transitionDuration(transitionDuration: number) {
+        this._transitionDuration = transitionDuration;
     }
 
     public init(): SelectionLifeCycle {
@@ -53,6 +63,10 @@ class SelectionLifeCycle {
         this.doDestroy();
         this.listeners[SelectionLifeCycle.DESTROY](this);
         return this;
+    }
+
+    protected transition(selection: D3.Selection): D3.Transition.Transition {
+        return selection.transition().duration(this.transitionDuration);
     }
 
     // abstract

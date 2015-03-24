@@ -4,9 +4,6 @@ import ChartModel = require('../../chartModel/ChartModel');
 import Axis = require('../Axis');
 
 class Row extends Chart {
-    // axis
-    public axisGridLines: boolean = true;
-
     public labelOffsetX: number = 10;
     public labelOffsetY: number = 0;
     public gap: number = 0.05;
@@ -18,7 +15,7 @@ class Row extends Chart {
 
     constructor(chartView: ChartView, chartModel: ChartModel) {
         super(chartView, chartModel);
-        this._xAxis = new Axis(this.chartView, this._x);
+        this._xAxis = new Axis('xAxis', this.chartView, this._x);
     }
 
     protected doRender(svg: D3.Selection): Row {
