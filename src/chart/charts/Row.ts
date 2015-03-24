@@ -15,7 +15,7 @@ class Row extends Chart {
 
     constructor(chartView: ChartView, chartModel: ChartModel) {
         super(chartView, chartModel);
-        this._xAxis = new Axis('xAxis', this.chartView, this._x);
+        this._xAxis = new Axis('xAxis', this, this._x);
     }
 
     protected doRender(svg: D3.Selection): Row {

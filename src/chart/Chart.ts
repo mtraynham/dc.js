@@ -1,9 +1,9 @@
 import Accessor = require('../util/Accessor');
 import ChartView = require('ChartView');
 import ChartModel = require('../chartModel/ChartModel');
-import SelectionLifeCycle = require('./SelectionLifeCycle');
+import SelectionComponent = require('./SelectionComponent');
 
-class Chart extends SelectionLifeCycle {
+class Chart extends SelectionComponent {
 
     public title: Accessor<any, string> = (d: any) => d.x;
     public label: Accessor<any, string>;
@@ -12,9 +12,13 @@ class Chart extends SelectionLifeCycle {
     private _chartModel: ChartModel;
 
     constructor(chartView: ChartView, chartModel: ChartModel) {
-        super(chartView);
+        super();
         this.chartView = chartView;
         this.chartModel = chartModel;
+    }
+
+    public get selection(): D3.Selection {
+        return this.chartView ? this.chartView.selection() : null;
     }
 
     public get chartView(): ChartView {
@@ -49,12 +53,18 @@ class Chart extends SelectionLifeCycle {
         }
     }
 
-    protected doRedraw(selection: D3.Selection): SelectionLifeCycle {
+    public render(): SelectionComponent {
+        this.chartView.selection(true);
+        super.render();
+        return super.redraw();
+    }
+
+    protected doRedraw(selection: D3.Selection): SelectionComponent {
         return this.doRedrawData(selection, this.chartModel.data());
     }
 
     // abstract
-    protected doRedrawData(selection: D3.Selection, data: Array<any>): SelectionLifeCycle {
+    protected doRedrawData(selection: D3.Selection, data: Array<any>): SelectionComponent {
         return this;
     }
 }

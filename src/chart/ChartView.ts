@@ -42,7 +42,7 @@ class ChartView implements SelectionProvider {
         return this.height;
     }
 
-    public selection(clear: boolean): D3.Selection {
+    public selection(clear: boolean = false): D3.Selection {
         if (!this.root) {
             return null;
         }

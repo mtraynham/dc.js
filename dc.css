@@ -78,7 +78,6 @@ div.dc-chart {
 .dc-chart .grid-line {
     fill: none;
     stroke: #ccc;
-    opacity: .5;
     shape-rendering: crispEdges;
 }
 
