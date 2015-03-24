@@ -27,7 +27,7 @@ class Row extends Chart {
     protected doRedrawData(svg: D3.Selection, data: Array<any>): Row {
         this._x
             .domain(data.map((d: any) => d.value))
-            .range([this.chartView.effectiveWidth, 0]);
+            .range([0, this.chartView.effectiveWidth]);
         this._y
             .domain(data.map((d: any) => d.key))
             .rangeBands([0, this.chartView.effectiveHeight]);

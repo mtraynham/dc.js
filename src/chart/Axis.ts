@@ -68,9 +68,9 @@ class Axis extends SelectionComponent {
 
     private orientAxisTransform(selection: D3.Selection) {
         if (this._axis.orient() === 'bottom') {
-            return `translate(0, ${selection.attr('height')})`;
+            return `translate(0, ${this._chart.chartView.effectiveHeight})`;
         } else if (this._axis.orient() === 'right') {
-            return `translate(${selection.attr('width')}, 0)`;
+            return `translate(${this._chart.chartView.effectiveWidth}, 0)`;
         }
         return `translate(0, 0)`;
     }
@@ -82,13 +82,13 @@ class Axis extends SelectionComponent {
                 .attr('x1', 0)
                 .attr('y1', 0)
                 .attr('x2', 0)
-                .attr('y2', bt * (+selection.attr('height')));
+                .attr('y2', bt * (+this._chart.chartView.effectiveHeight));
         } else {
             var lr: number = this._axis.orient() === 'right' ? -1 : 1;
             tickSelection
                 .attr('x1', 0)
                 .attr('y1', 0)
-                .attr('x2', lr * (+selection.attr('width')))
+                .attr('x2', lr * (+this._chart.chartView.effectiveWidth))
                 .attr('y2', 0);
         }
         return tickSelection;
