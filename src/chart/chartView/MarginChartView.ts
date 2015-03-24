@@ -10,11 +10,11 @@ class MarginChartView extends ChartView {
     }
 
     public get offsetWidth(): number {
-        return super.width - this.margins.left - this.margins.right;
+        return this.width - this.margins.left - this.margins.right;
     }
 
     public get offsetHeight(): number {
-        return super.height - this.margins.top - this.margins.bottom;
+        return this.height - this.margins.top - this.margins.bottom;
     }
 
     public selection(clear: boolean = false): D3.Selection {

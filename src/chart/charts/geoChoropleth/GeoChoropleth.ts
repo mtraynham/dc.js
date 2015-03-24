@@ -27,7 +27,7 @@ class GeoChoropleth extends Chart {
         return this._projection;
     }
 
-    protected doRender(svg: D3.Selection, data: Array<any>): Chart {
+    protected doRedraw(svg: D3.Selection, data: Array<any>): Chart {
         this._projectionChanged = false;
         if (this.showGraticule) {
             svg.append('path').attr('class', 'graticule').datum(this._graticule).attr('d', this._path);
@@ -46,10 +46,6 @@ class GeoChoropleth extends Chart {
                 .append('title');
         });
         return this.doRedraw(svg, data);
-    }
-
-    protected doRedraw(svg: D3.Selection, data: Array<any>): Chart {
-        return this;
     }
 }
 export = GeoChoropleth;

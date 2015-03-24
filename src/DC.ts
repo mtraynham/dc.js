@@ -5,6 +5,7 @@ export import Chart = require('./chart/Chart');
 export import Focusable = require('./chart/Focusable');
 
 export import GeoChoropleth = require('./chart/charts/geoChoropleth/GeoChoropleth');
+export import Row = require('./chart/charts/Row');
 
 export import ChartView = require('./chart/ChartView');
 export import MarginChartView = require('./chart/chartView/MarginChartView');

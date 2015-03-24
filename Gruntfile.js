@@ -329,19 +329,23 @@ module.exports = function (grunt) {
                 src: ['src/**/*.ts'],
                 outDir: './.tmp/ts',
                 options: {
-                    declaration: true,
+                    declaration: false,
                     module: 'commonjs',
                     compiler: './node_modules/typescript/bin/tsc'
                 }
             }
         },
 
-        'dts_bundle': {
+        'dts-generator': {
             dist: {
                 options: {
                     name: 'dc',
-                    main: '.tmp/ts/DC.d.ts',
-                    out: './dc.d.ts'
+                    baseDir: './src',
+                    files: '**/*.ts',
+                    excludes: 'references.ts',
+                    out: 'dc-typed.d.ts',
+                    main: 'dc/DC',
+                    indent: '    '
                 }
             }
         },
@@ -353,19 +357,14 @@ module.exports = function (grunt) {
                 externals: {
                     'd3': 'd3',
                     'crossfilter': 'crossfilter'
-                }
+                },
+                entry: './.tmp/ts/DC.js'
             },
             debug: {
                 devtool: 'source-map',
                 module: {
-                    preLoaders: [
-                        {
-                            test: /\.js$/,
-                            loader: 'source-map-loader'
-                        }
-                    ]
+                    preLoaders: [{test: /\.js$/, loader: 'source-map-loader'}]
                 },
-                entry: './.tmp/ts/DC.js',
                 output: {
                     sourcePrefix: '    ',
                     library: 'dc',
@@ -375,11 +374,11 @@ module.exports = function (grunt) {
                 }
             },
             dist: {
-                entry: './.tmp/ts/DC.js',
                 plugins: [
                     new webpack.optimize.UglifyJsPlugin()
                 ],
                 output: {
+                    sourcePrefix: '    ',
                     library: 'dc',
                     libraryTarget: 'umd',
                     path: './',
@@ -412,6 +411,20 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-ts');
     grunt.loadNpmTasks('grunt-tslint');
     grunt.loadNpmTasks('grunt-webpack');
+
+    grunt.registerMultiTask('dts-generator', 'Export TypeScript .d.ts definition', function () {
+        function globOption(option, baseDir) {
+            return option ? grunt.file.expand({cwd: baseDir}, option) : [];
+        }
+        var async = this.async();
+        var options = this.options({});
+        var baseDir = options['baseDir'] = options['baseDir'] || process.cwd();
+        options['files'] = globOption(options['files'], baseDir);
+        options['excludes'] = globOption(options['excludes'], baseDir);
+        require('dts-generator')
+            .generate(options)
+            .then(async.bind(true), async.bind(false));
+    });
 
     // custom tasks
     grunt.registerMultiTask('emu', 'Documentation extraction by emu.', function () {
@@ -472,7 +485,7 @@ module.exports = function (grunt) {
     grunt.registerTask('ci-pull', ['test', 'jasmine:specs:build', 'connect:server']);
     grunt.registerTask('lint', ['build', 'jshint', 'jscs']);
     grunt.registerTask('default', ['build']);
-    grunt.registerTask('typed', ['clean', 'tslint', 'ts', 'dts_bundle', 'webpack']);
+    grunt.registerTask('typed', ['clean', 'tslint', 'ts', 'dts-generator', 'webpack']);
 };
 
 module.exports.jsFiles = [

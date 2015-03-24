@@ -18,13 +18,17 @@ class CrossFilterChartModel<T, TDimension, R> extends ChartModel {
             this.dimension.filterFunction((value: TDimension) =>
                 this._filters.some((filter: Filter) => filter.isFiltered(value)));
         } else {
-            this.dimension.filter(null);
+            this.dimension.filterAll();
         }
         return this;
     }
 
     public data(): Array<CrossFilter.Grouping<T, R>> {
         return this.group.all();
+    }
+
+    public destroy(): void {
+        this.dimension.filterAll();
     }
 }
 export = CrossFilterChartModel;

@@ -3,10 +3,10 @@ import SelectionProvider = require('./SelectionProvider');
 
 class ChartView implements SelectionProvider {
 
-    public minWidth: number;
-    public maxWidth: number;
-    public minHeight: number;
-    public maxHeight: number;
+    public minWidth: number = 0;
+    public maxWidth: number = 1280;
+    public minHeight: number = 0;
+    public maxHeight: number = 1020;
 
     private _anchor: string;
     private _root: D3.Selection;
@@ -20,8 +20,10 @@ class ChartView implements SelectionProvider {
         if (this._anchor) {
             this._root.remove();
         }
-        this._root = d3.select(anchor);
-        this._anchor = anchor;
+        if (anchor) {
+            this._root = d3.select(anchor);
+            this._anchor = anchor;
+        }
     }
 
     public get anchor(): string {
@@ -33,7 +35,7 @@ class ChartView implements SelectionProvider {
     }
 
     public get width(): number {
-        return this._root ?
+        return this.root ?
             NumberUtils.clamp(
                 this._root.node().getBoundingClientRect().width,
                 Math.min(this.minWidth, 0),
@@ -42,7 +44,7 @@ class ChartView implements SelectionProvider {
     }
 
     public get height(): number {
-        return this._root ?
+        return this.root ?
             NumberUtils.clamp(
                 this._root.node().getBoundingClientRect().height,
                 Math.min(this.minHeight, 0),
@@ -51,8 +53,13 @@ class ChartView implements SelectionProvider {
     }
 
     public selection(clear: boolean): D3.Selection {
+        if (!this.root) {
+            return null;
+        }
         if (clear) {
-            this._svg.remove();
+            if (this._svg) {
+                this._svg.remove();
+            }
             this._svg = this.root.append('svg');
         }
         return this._svg

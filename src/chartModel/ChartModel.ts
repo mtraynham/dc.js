@@ -1,8 +1,15 @@
+import DataProvider = require('./DataProvider');
 import Filter = require('../filters/Filter');
-import Transform = require('./data/Transform');
-import Sort = require('./Sort');
 
-class ChartModel {
+class ChartModel implements DataProvider {
+
+    public static FILTER: string = 'filter';
+    public static APPLY: string = 'apply';
+
+    public listeners: D3.Dispatch = d3.dispatch(
+        ChartModel.FILTER,
+        ChartModel.APPLY
+    );
 
     protected _filters: Array<Filter> = [];
 
@@ -17,8 +24,9 @@ class ChartModel {
     }
 
     public isFiltered(key: any): boolean {
-        return this.filters.some((filter: Filter) =>
-            filter.isFiltered(key));
+        return this.filters.length < 1 ||
+            this.filters.some((filter: Filter) =>
+                filter.isFiltered(key));
     }
 
     public addFilter(filter: Filter): number {
@@ -58,6 +66,10 @@ class ChartModel {
     }
 
     public data(): Array<any> {
+        throw new Error('This method is abstract.');
+    }
+
+    public destroy(): void {
         throw new Error('This method is abstract.');
     }
 }

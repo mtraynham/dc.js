@@ -5,14 +5,14 @@ import SelectionLifeCycle = require('./SelectionLifeCycle');
 
 class Chart extends SelectionLifeCycle {
 
+    public title: Accessor<any, string> = (d: any) => d.x;
+    public label: Accessor<any, string>;
+
     private _chartView: ChartView;
     private _chartModel: ChartModel;
 
-    public title: Accessor<any, string>;
-    public label: Accessor<any, string>;
-
     constructor(chartView: ChartView, chartModel: ChartModel) {
-        super(chartView);
+        super(chartView, chartModel);
         this.chartView = chartView;
         this.chartModel = chartModel;
     }
@@ -33,13 +33,15 @@ class Chart extends SelectionLifeCycle {
     }
 
     public set chartModel(chartModel: ChartModel) {
-        this._chartModel = chartModel;
-    }
-
-    private requireUpdate() {
-        if (this.chartModel && this.chartView) {
-            this.render(this.chartModel.data());
+        if (this._chartModel) {
+            this._chartModel.destroy();
         }
+        this._chartModel = chartModel;
+        chartModel.listeners.on(ChartModel.FILTER, () => {
+            if (this.chartView) {
+                this.redraw();
+            }
+        });
     }
 }
 
