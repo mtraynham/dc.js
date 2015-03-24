@@ -5,7 +5,7 @@ class Axis extends SelectionComponent {
     private static DARK_LINE_OPACITY: number = 1;
     private static SOFT_LINE_OPACITY: number = 0.5;
 
-    public showGridLines: boolean = true;
+    public gridLines: boolean = true;
     public darkZeroLine: boolean = true;
 
     private _name: string;
@@ -34,7 +34,7 @@ class Axis extends SelectionComponent {
         selection.append('g')
             .attr('class', `axis ${this._name}`)
             .attr('opacity', 0)
-            .attr('transform', this.orientAxisTransform(selection))
+            .attr('transform', this.orientAxisTransform())
             .call(this._axis);
         return this;
     }
@@ -44,16 +44,17 @@ class Axis extends SelectionComponent {
         // axis
         var axisG: D3.Selection = selection.select(`g.axis.${this._name}`)
             .call(this._axis)
-            .attr('transform', this.orientAxisTransform(selection))
+            .attr('transform', this.orientAxisTransform())
             .call((axis: D3.Selection) => {
                 var ticks: D3.Selection = axis.selectAll('g.tick');
+                // todo: loop ticks and only change the opacity on ones that are missing
+                // prevents us from refreshing those ticks each time
                 ticks.style('opacity', 0);
                 if (ticks.select('line.grid-line').empty()) {
                     return this.orientAxisGridLinesTransform(
-                        selection,
                         ticks.append('line')
-                        .attr('opacity', 0)
-                        .attr('class', 'grid-line'));
+                            .attr('opacity', 0)
+                            .attr('class', 'grid-line'));
                 }
                 return selection;
             });
@@ -62,11 +63,16 @@ class Axis extends SelectionComponent {
             .selectAll('g.tick')
             .style('opacity', 1)
             .selectAll('line.grid-line')
-            .attr('opacity', (d: any) => this.showGridLines ? (d ? Axis.SOFT_LINE_OPACITY : Axis.DARK_LINE_OPACITY) : 0);
+            .attr('opacity', (d: any) =>
+                this.gridLines ?
+                    (!d && this.darkZeroLine ?
+                        Axis.DARK_LINE_OPACITY :
+                        Axis.SOFT_LINE_OPACITY) :
+                    0);
         return this;
     }
 
-    private orientAxisTransform(selection: D3.Selection) {
+    private orientAxisTransform() {
         if (this._axis.orient() === 'bottom') {
             return `translate(0, ${this._chart.chartView.effectiveHeight})`;
         } else if (this._axis.orient() === 'right') {
@@ -75,7 +81,7 @@ class Axis extends SelectionComponent {
         return `translate(0, 0)`;
     }
 
-    private orientAxisGridLinesTransform(selection: D3.Selection, tickSelection: D3.Selection) {
+    private orientAxisGridLinesTransform(tickSelection: D3.Selection) {
         if (this._axis.orient() === 'bottom' || this._axis.orient() === 'top') {
             var bt: number = this._axis.orient() === 'bottom' ? -1 : 1;
             tickSelection

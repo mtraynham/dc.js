@@ -15,7 +15,7 @@
     <script type="text/javascript" src="../bower_components/crossfilter/crossfilter.js"></script>
     <script type="text/javascript" src="../dc-typed.js"></script>
     <script>
-        var data = [{x: -5, y: 20}, {x: 15, y: 30}, {x: 10, y: 30}];
+        var data = [{x: 5, y: -20}, {x: 15, y: 30}, {x: 10, y: 30}];
         var index = crossfilter(data);
         var dimension = index.dimension(function (d) {
             return d.x;
