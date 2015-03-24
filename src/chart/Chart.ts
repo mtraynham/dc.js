@@ -12,7 +12,7 @@ class Chart extends SelectionLifeCycle {
     private _chartModel: ChartModel;
 
     constructor(chartView: ChartView, chartModel: ChartModel) {
-        super(chartView, chartModel);
+        super(chartView);
         this.chartView = chartView;
         this.chartModel = chartModel;
     }
@@ -26,6 +26,9 @@ class Chart extends SelectionLifeCycle {
             this._chartView.selection(true);
         }
         this._chartView = chartView;
+        if (chartView && this.chartModel) {
+            this.render();
+        }
     }
 
     public get chartModel(): ChartModel {
@@ -37,11 +40,22 @@ class Chart extends SelectionLifeCycle {
             this._chartModel.destroy();
         }
         this._chartModel = chartModel;
-        chartModel.listeners.on(ChartModel.FILTER, () => {
-            if (this.chartView) {
-                this.redraw();
-            }
-        });
+        if (chartModel) {
+            chartModel.listeners.on(ChartModel.FILTER, () => {
+                if (this.chartView) {
+                    this.redraw();
+                }
+            });
+        }
+    }
+
+    protected doRedraw(selection: D3.Selection): SelectionLifeCycle {
+        return this.doRedrawData(selection, this.chartModel.data());
+    }
+
+    // abstract
+    protected doRedrawData(selection: D3.Selection, data: Array<any>): SelectionLifeCycle {
+        return this;
     }
 }
 

@@ -1,5 +1,4 @@
 import SelectionProvider = require('./SelectionProvider');
-import DataProvider = require('../chartModel/DataProvider');
 
 class SelectionLifeCycle {
 
@@ -22,11 +21,9 @@ class SelectionLifeCycle {
     );
 
     private _selectionProvider: SelectionProvider;
-    private _dataProvider: DataProvider;
 
-    constructor(selectionProvider: SelectionProvider, dataProvider: DataProvider) {
+    constructor(selectionProvider: SelectionProvider) {
         this._selectionProvider = selectionProvider;
-        this._dataProvider = dataProvider;
     }
 
     public init(): SelectionLifeCycle {
@@ -45,10 +42,9 @@ class SelectionLifeCycle {
     }
 
     public redraw(): SelectionLifeCycle {
-        var data: Array<any> = this._dataProvider.data();
         this.listeners[SelectionLifeCycle.PRE_REDRAW](this);
         this.listeners[SelectionLifeCycle.RENDERLET](this);
-        this.doRedraw(this._selectionProvider.selection(), data);
+        this.doRedraw(this._selectionProvider.selection(false));
         this.listeners[SelectionLifeCycle.POST_REDRAW](this);
         return this;
     }
@@ -59,22 +55,24 @@ class SelectionLifeCycle {
         return this;
     }
 
+    // abstract
     protected doInit(): SelectionLifeCycle {
-        throw new Error('Method is abstract.');
+        return this;
     }
 
     // abstract
     protected doRender(selection: D3.Selection): SelectionLifeCycle {
-        throw new Error('Method is abstract.');
+        return this;
     }
 
     // abstract
-    protected doRedraw(selection: D3.Selection, data: Array<any>): SelectionLifeCycle {
-        throw new Error('Method is abstract.');
+    protected doRedraw(selection: D3.Selection): SelectionLifeCycle {
+        return this;
     }
 
+    // abstract
     protected doDestroy(): SelectionLifeCycle {
-        throw new Error('Method is abstract.');
+        return this;
     }
 }
 export = SelectionLifeCycle;

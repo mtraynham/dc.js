@@ -34,22 +34,12 @@ class ChartView implements SelectionProvider {
         return this._root;
     }
 
-    public get width(): number {
-        return this.root ?
-            NumberUtils.clamp(
-                this._root.node().getBoundingClientRect().width,
-                Math.min(this.minWidth, 0),
-                this.maxWidth) :
-            0;
+    public get effectiveWidth(): number {
+        return this.width;
     }
 
-    public get height(): number {
-        return this.root ?
-            NumberUtils.clamp(
-                this._root.node().getBoundingClientRect().height,
-                Math.min(this.minHeight, 0),
-                this.maxHeight) :
-            0;
+    public get effectiveHeight(): number {
+        return this.height;
     }
 
     public selection(clear: boolean): D3.Selection {
@@ -65,6 +55,24 @@ class ChartView implements SelectionProvider {
         return this._svg
             .attr('width', this.width)
             .attr('height', this.height);
+    }
+
+    protected get width(): number {
+        return this.root ?
+            NumberUtils.clamp(
+                this._root.node().getBoundingClientRect().width,
+                Math.min(this.minWidth, 0),
+                this.maxWidth) :
+            0;
+    }
+
+    protected get height(): number {
+        return this.root ?
+            NumberUtils.clamp(
+                this._root.node().getBoundingClientRect().height,
+                Math.min(this.minHeight, 0),
+                this.maxHeight) :
+            0;
     }
 }
 export = ChartView;

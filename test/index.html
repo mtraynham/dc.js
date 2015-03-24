@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="test">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+    <meta http-equiv="Pragma" content="no-cache"/>
+    <meta http-equiv="Expires" content="0"/>
+
+    <link rel="stylesheet" type="text/css" href="../dc.css">
+</head>
+<body ng-controller="TestCtrl">
+    <div id="test" class="dc-chart" style="height: 500px; width: 50%;"></div>
+
+    <script type="text/javascript" src="../bower_components/d3/d3.js"></script>
+    <script type="text/javascript" src="../bower_components/crossfilter/crossfilter.js"></script>
+    <script type="text/javascript" src="../dc-typed.js"></script>
+    <script>
+        var data = [{x: 10, y: 20}, {x: 15, y: 30}, {x: 10, y: 30}];
+        var index = crossfilter(data);
+        var dimension = index.dimension(function (d) {
+            return d.x;
+        });
+        var group = dimension.group().reduceSum(function (d) {
+            return d.y;
+        });
+
+        var dc = window['dc'];
+        var model = new dc.CrossFilterChartModel(dimension, group);
+        var view = new dc.MarginChartView("#test");
+        var chart = new dc.Row(view, model);
+        chart.render();
+    </script>
+</body>
+</html>

@@ -9,12 +9,12 @@ class MarginChartView extends ChartView {
         this.margins = margins;
     }
 
-    public get offsetWidth(): number {
-        return this.width - this.margins.left - this.margins.right;
+    public get effectiveWidth(): number {
+        return this.offsetWidth;
     }
 
-    public get offsetHeight(): number {
-        return this.height - this.margins.top - this.margins.bottom;
+    public get effectiveHeight(): number {
+        return this.offsetHeight;
     }
 
     public selection(clear: boolean = false): D3.Selection {
@@ -23,6 +23,14 @@ class MarginChartView extends ChartView {
             .attr('width', this.offsetWidth)
             .attr('height', this.offsetHeight)
             .attr('transform', `translate(${this.margins.left}, ${this.margins.top})`);
+    }
+
+    protected get offsetWidth(): number {
+        return this.width - this.margins.left - this.margins.right;
+    }
+
+    protected get offsetHeight(): number {
+        return this.height - this.margins.top - this.margins.bottom;
     }
 }
 export = MarginChartView;
