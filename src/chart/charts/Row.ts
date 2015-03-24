@@ -24,15 +24,15 @@ class Row extends Chart {
         var domain: Array<any> = d3.set(layeredData.map((data: any) => data.x)).values();
 
         this.x.domain(d3.extent(layeredData.map((data: any) => data.y0 + data.y1).concat[0]))
-            .range([0, this.chartView.width()]);
+            .range([0, this.chartView.width]);
         this.y.domain(domain)
-            .rangeBands([0, this.chartView.height()]);
+            .rangeBands([0, this.chartView.height]);
 
         var axisG: D3.Selection = svg.select('g.axis');
         if (axisG.empty()) {
             axisG = svg.append('g')
                 .attr('class', 'axis')
-                .attr('transform', 'translate(0, ' + this.chartView.height() + ')');
+                .attr('transform', 'translate(0, ' + this.chartView.height + ')');
         }
         axisG.call(this.xAxis);
 
@@ -40,7 +40,7 @@ class Row extends Chart {
         if (ticks.selectAll('line.grid-line').empty()) {
             ticks.append('line')
                 .attr('class', (data: number) => data ? 'grid-line' : '') // don't set css for 0 grid line
-                .attr('y2', -this.chartView.height());
+                .attr('y2', -this.chartView.height);
         }
 
         var rows: D3.UpdateSelection = svg.selectAll('rect.' + Row.ROW_CSS_CLASS)

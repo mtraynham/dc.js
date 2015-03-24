@@ -17,10 +17,10 @@ class MarginChartView extends ChartView {
         return super.height - this.margins.top - this.margins.bottom;
     }
 
-    public svg(clear: boolean = false): D3.Selection {
-        var svg: D3.Selection = super.svg(clear);
+    public selection(clear: boolean = false): D3.Selection {
+        var svg: D3.Selection = super.selection(clear);
         return (clear ? svg.append('g') : svg.select('g'))
-            .attr('width', this.offsetWidth
+            .attr('width', this.offsetWidth)
             .attr('height', this.offsetHeight)
             .attr('transform', `translate(${this.margins.left}, ${this.margins.top})`);
     }

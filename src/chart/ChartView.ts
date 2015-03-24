@@ -1,6 +1,8 @@
 import NumberUtils = require('../util/NumberUtils');
+import SelectionProvider = require('./SelectionProvider');
 
-class ChartView {
+class ChartView implements SelectionProvider {
+
     public minWidth: number;
     public maxWidth: number;
     public minHeight: number;
@@ -48,7 +50,7 @@ class ChartView {
             0;
     }
 
-    public svg(clear: boolean = false): D3.Selection {
+    public selection(clear: boolean): D3.Selection {
         if (clear) {
             this._svg.remove();
             this._svg = this.root.append('svg');

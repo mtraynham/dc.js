@@ -1,51 +1,45 @@
+import Accessor = require('../util/Accessor');
 import ChartView = require('ChartView');
 import ChartModel = require('../chartModel/ChartModel');
-import Accessor = require('../util/Accessor');
+import SelectionLifeCycle = require('./SelectionLifeCycle');
 
-class Chart {
-    public chartView: ChartView;
-    public chartModel: ChartModel;
+class Chart extends SelectionLifeCycle {
+
+    private _chartView: ChartView;
+    private _chartModel: ChartModel;
 
     public title: Accessor<any, string>;
     public label: Accessor<any, string>;
 
-    public listeners: D3.Dispatch = d3.dispatch(
-        'preRender',
-        'postRender',
-        'preRedraw',
-        'postRedraw',
-        'renderlet'
-    );
-
     constructor(chartView: ChartView, chartModel: ChartModel) {
+        super(chartView);
         this.chartView = chartView;
         this.chartModel = chartModel;
     }
 
-    public render(): Chart {
-        this.listeners['preRender'](this);
-        this.listeners['renderlet'](this);
-        this.doRender(this.chartView.svg(true), this.chartModel.data());
-        this.listeners['postRender'](this);
-        return this;
+    public get chartView(): ChartView {
+        return this._chartView;
     }
 
-    public redraw(): Chart {
-        this.listeners['preRedraw'](this);
-        this.listeners['renderlet'](this);
-        this.doRedraw(this.chartView.svg(), this.chartModel.data());
-        this.listeners['postRedraw'](this);
-        return this;
+    public set chartView(chartView: ChartView) {
+        if (this._chartView) {
+            this._chartView.selection(true);
+        }
+        this._chartView = chartView;
     }
 
-    // abstract
-    protected doRender(svg: D3.Selection, data: Array<any>): Chart {
-        throw new Error('Method is abstract.');
+    public get chartModel(): ChartModel {
+        return this._chartModel;
     }
 
-    // abstract
-    protected doRedraw(svg: D3.Selection, data: Array<any>): Chart {
-        throw new Error('Method is abstract.');
+    public set chartModel(chartModel: ChartModel) {
+        this._chartModel = chartModel;
+    }
+
+    private requireUpdate() {
+        if (this.chartModel && this.chartView) {
+            this.render(this.chartModel.data());
+        }
     }
 }
 

@@ -1,15 +1,24 @@
 import Filter = require('../filters/Filter');
 import Transform = require('./data/Transform');
+import Sort = require('./Sort');
 
 class ChartModel {
 
     protected _filters: Array<Filter> = [];
-    protected _sort:
+
+    public get filters(): Array<Filter> {
+        return this._filters;
+    }
 
     public hasFilter(filter?: Filter): boolean {
         return arguments.length ?
             this._filters.indexOf(filter) > -1 :
             this._filters.length > 0;
+    }
+
+    public isFiltered(key: any): boolean {
+        return this.filters.some((filter: Filter) =>
+            filter.isFiltered(key));
     }
 
     public addFilter(filter: Filter): number {

@@ -1,20 +1,101 @@
-/*!
- *  dc %VERSION%
- *  http://dc-js.github.io/dc.js/
- *  Copyright 2012 Nick Zhu and other contributors
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
+var generatePropProxy = function (arr, property, accessor) {
+    var memoize = [];
+    return new Proxy(arr, {
+        get(target, key) {
+            return memoize[key] || (memoize[key] = accessor(target[key]));
+        }
+    });
+};
 
-(function() { function _dc(d3, crossfilter) {
-'use strict';
+var invertProxy = function (arr, x, y, z) {
+    var memoize = [];
+    return new Proxy(arr, {
+        get(target, key, receiver) {
+            console.log(key);
+            if (!isNaN(key)) {
+                console.log('number');
+                return memoize[key] || (memoize[key] = {x: x[key], y: y[key], z: z[key], data: arr[key]});
+            }
+            return arr[key];
+        }
+    });
+};
+
+var data = [
+        {a: 'foo', b: 'bar', c: 'd'},
+        {a: 'foo1', b: 'bar1', c: 'd1'}
+    ],
+    data = invertProxy(data,
+        generatePropProxy(data, 'x', function (d) { return d.a; }),
+        generatePropProxy(data, 'y', function (d) { return d.b; }),
+        generatePropProxy(data, 'z', function (d) { return d.c; }));
+
+
+
+
+var data = [];
+    xAccessor = function(d) { return d.a },
+    yAccessor = function(d) { return d.b },
+    zAccessor = function(d) { return d.c };
+
+for (var i = 0; i < 100; i++) {
+    data[i] = {a: 1, b: 1, c: 1};
+}
+
+var generatePropProxy = function (arr, property, accessor) {
+    var memoize = [];
+    return new Proxy(arr, {
+        get(target, key) {
+            return memoize[key] || (memoize[key] = accessor(target[key]));
+        }
+    });
+};
+
+var invertProxy = function (arr, x, y, z) {
+    var memoize = [];
+    return new Proxy(arr, {
+        get(target, key) {
+            return memoize[key] || (memoize[key] = {x: x[key], y: y[key], z: z[key], data: arr[key]});
+        }
+    });
+};
+
+var aData = [];
+for (var i = 0; i < data.length; i++) {
+    aData[i] = {
+        x: xAccessor(data[i]),
+        y: yAccessor(data[i]),
+        z: zAccessor(data[i]),
+        data: data[i]
+    };
+}
+
+var bData = [];
+for (var i = 0; i < data.length; i++) {
+    bData[i] = new Proxy(data[i], {
+        get(target, key) {
+            if (key === 'x') {
+                return xAccessor(data[i]);
+            } else if (key === 'y') {
+                return yAccessor(data[i]);
+            } else if (key === 'z') {
+                return zAccessor(data[i]);
+            } else {
+                return data[i];
+            }
+        }
+    });
+}
+
+var cData = invertProxy(data,
+        generatePropProxy(data, 'x', function (d) { return d.a; }),
+        generatePropProxy(data, 'y', function (d) { return d.b; }),
+        generatePropProxy(data, 'z', function (d) { return d.c; }));
+
+
+for (var i = 0; i < array.length; i++) {
+    console.log(array[i]['x']);
+    console.log(array[i]['y']);
+    console.log(array[i]['z']);
+    console.log(array[i]['data']);
+}
