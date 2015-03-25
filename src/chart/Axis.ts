@@ -34,7 +34,6 @@ class Axis extends SelectionComponent {
         return this;
     }
 
-
     public doRedraw(selection: D3.Selection): Axis {
         // axis
         var axisG: D3.Selection = selection.select(`g.axis.${this._name}`)
@@ -58,6 +57,11 @@ class Axis extends SelectionComponent {
                 this.gridLines ?
                     ((!d && this.zeroGridLineOpacity) || this.gridLineOpacity) :
                     0);
+        return this;
+    }
+
+    public doDestroy(selection: D3.Selection): SelectionComponent {
+        selection.select(`g.axis.${this._name}`).remove();
         return this;
     }
 

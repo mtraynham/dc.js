@@ -56,7 +56,7 @@ class ChartComponent extends SelectionComponent {
     }
 
     public destroy(): ChartComponent {
-        this.doDestroy();
+        this.doDestroy(this.selectionProvider.selection(false));
         this.listeners[ChartComponent.DESTROY](this);
         return this;
     }

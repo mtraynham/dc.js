@@ -16,7 +16,7 @@ class Row extends Chart {
     constructor(selectionProvider: ChartView,
                 dataProvider: ChartModel) {
         super(selectionProvider, dataProvider);
-        this._xAxis = new Axis(selectionProvider, 'xAxis');
+        this._xAxis = new Axis(selectionProvider, 'xAxis', this._x);
     }
 
     public get xAxis(): D3.Svg.Axis {
@@ -38,7 +38,6 @@ class Row extends Chart {
             .rangeBands([0, this.selectionProvider.effectiveHeight]);
 
         // axis
-        this._xAxis.axis.scale(this._x);
         this._xAxis.doRedraw(svg);
 
         // rows
@@ -55,6 +54,11 @@ class Row extends Chart {
          rowsEnter.append('title')
             .text(this.title);
         rows.exit().remove();
+        return this;
+    }
+
+    public doDestroy(svg: D3.Selection): Row {
+        this._xAxis.doDestroy(svg);
         return this;
     }
 }

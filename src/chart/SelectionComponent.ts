@@ -27,9 +27,10 @@ class SelectionComponent {
     }
 
     // abstract
-    public doDestroy(): SelectionComponent {
+    public doDestroy(selection: D3.Selection): SelectionComponent {
         return this;
     }
+
     protected transition(selection: D3.Selection): D3.Transition.Transition {
         return selection.transition().duration(this.transitionDuration);
     }
