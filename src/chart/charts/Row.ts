@@ -13,9 +13,10 @@ class Row extends Chart {
     private _y: D3.Scale.OrdinalScale = d3.scale.ordinal();
     private _xAxis: Axis;
 
-    constructor(selectionProvider: ChartView, dataProvider: ChartModel) {
+    constructor(selectionProvider: ChartView,
+                dataProvider: ChartModel) {
         super(selectionProvider, dataProvider);
-        this._xAxis = new Axis('xAxis', selectionProvider);
+        this._xAxis = new Axis(selectionProvider, 'xAxis');
     }
 
     public doRender(svg: D3.Selection): Row {

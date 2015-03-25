@@ -25,9 +25,9 @@
         });
 
         var dc = window['dc'];
-        var model = new dc.CrossFilterChartModel(dimension, group);
-        var view = new dc.MarginChartView("#test");
-        var chart = new dc.Row(view, model);
+        var chart = new dc.Row(
+                new dc.MarginChartView("#test"),
+                new dc.CrossFilterChartModel(dimension, group));
         chart.render();
     </script>
 </body>
