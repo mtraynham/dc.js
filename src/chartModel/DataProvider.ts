@@ -1,4 +1,6 @@
-interface DataProvider {
-    data(): Array<any>;
+class DataProvider {
+    public data(): Array<any> {
+        throw new Error('This method is abstract.');
+    }
 }
 export = DataProvider;

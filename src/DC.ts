@@ -37,7 +37,7 @@ export import Units = require('./util/Units');
 export import properties = require('./Properties');
 
 export var filterAll: (group: string) => void = (group: string) =>
-    chartRegistry.list(group).forEach((chart: Chart) => chart.chartModel.filter(null));
+    chartRegistry.list(group).forEach((chart: Chart) => chart.dataProvider.filter(null));
 
 export var refocusAll: (group: string) => void = (group: string) =>
     chartRegistry.list(group);

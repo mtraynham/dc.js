@@ -65,6 +65,10 @@ module.exports = function (grunt) {
                 files: ['src/**/*.js'],
                 tasks: ['build', 'copy']
             },
+            typed: {
+                files: ['src/**/*.ts'],
+                tasks: ['typed']
+            },
             jasmineRunner: {
                 files: ['spec/**/*.js'],
                 tasks: ['jasmine:specs:build']

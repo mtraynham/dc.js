@@ -1,71 +1,46 @@
 import Accessor = require('../util/Accessor');
-import ChartView = require('ChartView');
+import ChartComponent = require('./ChartComponent');
 import ChartModel = require('../chartModel/ChartModel');
-import SelectionComponent = require('./SelectionComponent');
+import ChartView = require('ChartView');
 
-class Chart extends SelectionComponent {
+class Chart extends ChartComponent {
 
     public title: Accessor<any, string> = (d: any) => d.x;
     public label: Accessor<any, string>;
 
-    private _chartView: ChartView;
-    private _chartModel: ChartModel;
+    private _selectionProvider: ChartView;
+    private _dataProvider: ChartModel;
 
-    constructor(chartView: ChartView, chartModel: ChartModel) {
-        super();
-        this.chartView = chartView;
-        this.chartModel = chartModel;
+    public get selectionProvider(): ChartView {
+        return this._selectionProvider;
     }
 
-    public get selection(): D3.Selection {
-        return this.chartView ? this.chartView.selection() : null;
-    }
-
-    public get chartView(): ChartView {
-        return this._chartView;
-    }
-
-    public set chartView(chartView: ChartView) {
-        if (this._chartView) {
-            this._chartView.selection(true);
+    public set selectionProvider(selectionProvider: ChartView) {
+        if (this._selectionProvider) {
+            this._selectionProvider.selection(true);
         }
-        this._chartView = chartView;
-        if (chartView && this.chartModel) {
+        this._selectionProvider = selectionProvider;
+        if (selectionProvider && this.dataProvider) {
             this.render();
         }
     }
 
-    public get chartModel(): ChartModel {
-        return this._chartModel;
+    public get dataProvider(): ChartModel {
+        return this._dataProvider;
     }
 
-    public set chartModel(chartModel: ChartModel) {
-        if (this._chartModel) {
-            this._chartModel.destroy();
+    public set dataProvider(dataProvider: ChartModel) {
+        if (this._dataProvider) {
+            this._dataProvider.destroy();
         }
-        this._chartModel = chartModel;
-        if (chartModel) {
-            chartModel.listeners.on(ChartModel.FILTER, () => {
-                if (this.chartView) {
+        this._dataProvider = dataProvider;
+        if (dataProvider) {
+            dataProvider.listeners.on(ChartModel.FILTER, () => {
+                if (this.selectionProvider) {
                     this.redraw();
                 }
             });
         }
-    }
-
-    public render(): SelectionComponent {
-        this.chartView.selection(true);
-        super.render();
-        return super.redraw();
-    }
-
-    protected doRedraw(selection: D3.Selection): SelectionComponent {
-        return this.doRedrawData(selection, this.chartModel.data());
-    }
-
-    // abstract
-    protected doRedrawData(selection: D3.Selection, data: Array<any>): SelectionComponent {
-        return this;
     }
 }
 

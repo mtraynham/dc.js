@@ -1,35 +1,26 @@
-import Chart = require('./Chart');
+import ChartContainer = require('./ChartContainer');
 import SelectionComponent = require('./SelectionComponent');
 
 class Axis extends SelectionComponent {
-    private static DARK_LINE_OPACITY: number = 1;
-    private static SOFT_LINE_OPACITY: number = 0.5;
-
     public gridLines: boolean = true;
-    public darkZeroLine: boolean = true;
+    public zeroGridLineOpacity: number = 1;
+    public gridLineOpacity: number = 0.5;
 
+    private _chartContainer: ChartContainer;
     private _name: string;
-    private _chart: Chart;
     private _axis: D3.Svg.Axis = d3.svg.axis();
 
-    constructor(name: string,
-                chart: Chart,
-                scale: D3.Scale.GenericScale<any>) {
+    constructor(chartContainer: ChartContainer, name: string) {
         super();
+        this._chartContainer = chartContainer;
         this._name = name;
-        this._chart = chart;
-        this._axis.scale(scale);
-    }
-
-    public get selection() {
-        return this._chart.selection;
     }
 
     public get axis() {
         return this._axis;
     }
 
-    protected doRender(selection: D3.Selection): Axis {
+    public doRender(selection: D3.Selection): Axis {
         // axis
         selection.append('g')
             .attr('class', `axis ${this._name}`)
@@ -40,61 +31,51 @@ class Axis extends SelectionComponent {
     }
 
 
-    protected doRedraw(selection: D3.Selection): Axis {
+    public doRedraw(selection: D3.Selection): Axis {
         // axis
         var axisG: D3.Selection = selection.select(`g.axis.${this._name}`)
             .call(this._axis)
             .attr('transform', this.orientAxisTransform())
             .call((axis: D3.Selection) => {
                 var ticks: D3.Selection = axis.selectAll('g.tick');
-                // todo: loop ticks and only change the opacity on ones that are missing
-                // prevents us from refreshing those ticks each time
-                ticks.style('opacity', 0);
                 if (ticks.select('line.grid-line').empty()) {
-                    return this.orientAxisGridLinesTransform(
+                    this.orientAxisGridLines(
                         ticks.append('line')
-                            .attr('opacity', 0)
-                            .attr('class', 'grid-line'));
+                            .attr('class', 'grid-line')
+                            .attr('x1', 0)
+                            .attr('y1', 0));
                 }
-                return selection;
+                return axis;
             });
         this.transition(axisG)
             .attr('opacity', 1)
-            .selectAll('g.tick')
-            .style('opacity', 1)
             .selectAll('line.grid-line')
             .attr('opacity', (d: any) =>
                 this.gridLines ?
-                    (!d && this.darkZeroLine ?
-                        Axis.DARK_LINE_OPACITY :
-                        Axis.SOFT_LINE_OPACITY) :
+                    ((!d && this.zeroGridLineOpacity) || this.gridLineOpacity) :
                     0);
         return this;
     }
 
     private orientAxisTransform() {
         if (this._axis.orient() === 'bottom') {
-            return `translate(0, ${this._chart.chartView.effectiveHeight})`;
+            return `translate(0, ${this._chartContainer.effectiveHeight})`;
         } else if (this._axis.orient() === 'right') {
-            return `translate(${this._chart.chartView.effectiveWidth}, 0)`;
+            return `translate(${this._chartContainer.effectiveWidth}, 0)`;
         }
         return `translate(0, 0)`;
     }
 
-    private orientAxisGridLinesTransform(tickSelection: D3.Selection) {
+    private orientAxisGridLines(tickSelection: D3.Selection) {
         if (this._axis.orient() === 'bottom' || this._axis.orient() === 'top') {
             var bt: number = this._axis.orient() === 'bottom' ? -1 : 1;
             tickSelection
-                .attr('x1', 0)
-                .attr('y1', 0)
                 .attr('x2', 0)
-                .attr('y2', bt * (+this._chart.chartView.effectiveHeight));
+                .attr('y2', bt * (+this._chartContainer.effectiveHeight));
         } else {
             var lr: number = this._axis.orient() === 'right' ? -1 : 1;
             tickSelection
-                .attr('x1', 0)
-                .attr('y1', 0)
-                .attr('x2', lr * (+this._chart.chartView.effectiveWidth))
+                .attr('x2', lr * (+this._chartContainer.effectiveWidth))
                 .attr('y2', 0);
         }
         return tickSelection;

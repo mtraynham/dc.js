@@ -9,13 +9,13 @@
     <link rel="stylesheet" type="text/css" href="../dc.css">
 </head>
 <body ng-controller="TestCtrl">
-    <div id="test" class="dc-chart" style="height: 500px; width: 50%;"></div>
+    <div id="test" class="dc-chart" style="height: 500px; width: 50%; background-color: yellow;"></div>
 
     <script type="text/javascript" src="../bower_components/d3/d3.js"></script>
     <script type="text/javascript" src="../bower_components/crossfilter/crossfilter.js"></script>
     <script type="text/javascript" src="../dc-typed.js"></script>
     <script>
-        var data = [{x: 5, y: -20}, {x: 15, y: 30}, {x: 10, y: 30}];
+        var data = [{x: 5, y: -20}, {x: 45, y: 30}, {x: 10, y: 30}];
         var index = crossfilter(data);
         var dimension = index.dimension(function (d) {
             return d.x;

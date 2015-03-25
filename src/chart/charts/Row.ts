@@ -13,27 +13,28 @@ class Row extends Chart {
     private _y: D3.Scale.OrdinalScale = d3.scale.ordinal();
     private _xAxis: Axis;
 
-    constructor(chartView: ChartView, chartModel: ChartModel) {
-        super(chartView, chartModel);
-        this._xAxis = new Axis('xAxis', this, this._x);
+    constructor(selectionProvider: ChartView, dataProvider: ChartModel) {
+        super(selectionProvider, dataProvider);
+        this._xAxis = new Axis('xAxis', selectionProvider);
     }
 
-    protected doRender(svg: D3.Selection): Row {
+    public doRender(svg: D3.Selection): Row {
         // axis
-        this._xAxis.render();
+        this._xAxis.doRender(svg);
         return this;
     }
 
-    protected doRedrawData(svg: D3.Selection, data: Array<any>): Row {
+    public doRedraw(svg: D3.Selection, data: Array<any>): Row {
         this._x
             .domain(data.map((d: any) => d.value))
-            .range([0, this.chartView.effectiveWidth]);
+            .range([0, this.selectionProvider.effectiveWidth]);
         this._y
             .domain(data.map((d: any) => d.key))
-            .rangeBands([0, this.chartView.effectiveHeight]);
+            .rangeBands([0, this.selectionProvider.effectiveHeight]);
 
         // axis
-        this._xAxis.redraw();
+        this._xAxis.axis.scale(this._x);
+        this._xAxis.doRedraw(svg);
 
         // rows
         var rows: D3.UpdateSelection = svg.selectAll('rect')
@@ -43,9 +44,9 @@ class Row extends Chart {
             .attr('width', 0)
             .attr('x', 0)
             .attr('fill', 'white')
-            .on('click', (data: any) => this.chartModel.filter(data.key))
-            .classed('deselected', (data: any) => this.chartModel.isFiltered(data.key))
-            .classed('selected', (data: any) => !this.chartModel.isFiltered(data.key));
+            .on('click', (data: any) => this.dataProvider.filter(data.key))
+            .classed('deselected', (data: any) => this.dataProvider.isFiltered(data.key))
+            .classed('selected', (data: any) => !this.dataProvider.isFiltered(data.key));
          rowsEnter.append('title')
             .text(this.title);
         rows.exit().remove();

@@ -1,7 +1,8 @@
+import ChartContainer = require('./ChartContainer');
 import NumberUtils = require('../util/NumberUtils');
 import SelectionProvider = require('./SelectionProvider');
 
-class ChartView implements SelectionProvider {
+class ChartView implements SelectionProvider, ChartContainer {
 
     public minWidth: number = 0;
     public maxWidth: number = 1280;
