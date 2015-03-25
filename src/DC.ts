@@ -2,7 +2,6 @@ import ChartRegistry = require('./ChartRegistry');
 export var chartRegistry: ChartRegistry = new ChartRegistry();
 
 export import Chart = require('./chart/Chart');
-export import Focusable = require('./chart/Focusable');
 
 export import Row = require('./chart/charts/Row');
 
@@ -41,9 +40,6 @@ export var filterAll: (group: string) => void = (group: string) =>
 
 export var refocusAll: (group: string) => void = (group: string) =>
     chartRegistry.list(group);
-        // fix
-        // .filter((chart: Chart) => chart instanceof Focusable)
-        // .forEach((chart: Chart) => (<Focusable>chart).focus());
 
 export var renderAll: (group: string) => void = (group: string) =>
     chartRegistry.list(group).forEach((chart: Chart) => chart.render());

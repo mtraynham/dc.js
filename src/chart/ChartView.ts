@@ -1,8 +1,8 @@
-import ChartContainer = require('./ChartContainer');
+import IChartContainer = require('./IChartContainer');
+import ISelectionProvider = require('./ISelectionProvider');
 import NumberUtils = require('../util/NumberUtils');
-import SelectionProvider = require('./SelectionProvider');
 
-class ChartView implements SelectionProvider, ChartContainer {
+class ChartView implements ISelectionProvider, IChartContainer {
 
     public minWidth: number = 0;
     public maxWidth: number = 1280;

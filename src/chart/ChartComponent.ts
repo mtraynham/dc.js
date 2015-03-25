@@ -1,6 +1,6 @@
-import DataProvider = require('../chartModel/DataProvider');
+import IDataProvider = require('../chartModel/IDataProvider');
 import SelectionComponent = require('./SelectionComponent');
-import SelectionProvider = require('./SelectionProvider');
+import ISelectionProvider = require('./ISelectionProvider');
 
 class ChartComponent extends SelectionComponent {
 
@@ -22,11 +22,11 @@ class ChartComponent extends SelectionComponent {
         ChartComponent.RENDERLET
     );
 
-    public selectionProvider: SelectionProvider;
-    public dataProvider: DataProvider;
+    public selectionProvider: ISelectionProvider;
+    public dataProvider: IDataProvider;
 
-    constructor(selectionProvider: SelectionProvider,
-                dataProvider: DataProvider) {
+    constructor(selectionProvider: ISelectionProvider,
+                dataProvider: IDataProvider) {
         super();
         this.selectionProvider = selectionProvider;
         this.dataProvider = dataProvider;

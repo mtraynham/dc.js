@@ -1,7 +1,7 @@
+import Axis = require('../Axis');
 import Chart = require('../Chart');
 import ChartView = require('../ChartView');
 import ChartModel = require('../../chartModel/ChartModel');
-import Axis = require('../Axis');
 
 class Row extends Chart {
     public labelOffsetX: number = 10;
@@ -17,6 +17,10 @@ class Row extends Chart {
                 dataProvider: ChartModel) {
         super(selectionProvider, dataProvider);
         this._xAxis = new Axis(selectionProvider, 'xAxis');
+    }
+
+    public get xAxis(): D3.Svg.Axis {
+        return this._xAxis.axis;
     }
 
     public doRender(svg: D3.Selection): Row {

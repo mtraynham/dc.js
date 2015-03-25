@@ -1,7 +1,7 @@
-import DataProvider = require('./DataProvider');
+import IDataProvider = require('./IDataProvider');
 import Filter = require('../filters/Filter');
 
-class ChartModel implements DataProvider {
+class ChartModel implements IDataProvider {
 
     public static FILTER: string = 'filter';
     public static APPLY: string = 'apply';

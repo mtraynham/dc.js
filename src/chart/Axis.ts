@@ -1,4 +1,4 @@
-import ChartContainer = require('./ChartContainer');
+import IChartContainer = require('./IChartContainer');
 import SelectionComponent = require('./SelectionComponent');
 
 class Axis extends SelectionComponent {
@@ -6,14 +6,18 @@ class Axis extends SelectionComponent {
     public zeroGridLineOpacity: number = 1;
     public gridLineOpacity: number = 0.5;
 
-    private _chartContainer: ChartContainer;
+    private _chartContainer: IChartContainer;
     private _name: string;
     private _axis: D3.Svg.Axis = d3.svg.axis();
 
-    constructor(chartContainer: ChartContainer, name: string) {
+    constructor(chartContainer: IChartContainer,
+                name: string,
+                scale?: D3.Scale.GenericScale<any>,
+                orient?: string) {
         super();
         this._chartContainer = chartContainer;
         this._name = name;
+        this._axis.scale(scale).orient(orient);
     }
 
     public get axis() {
@@ -57,7 +61,7 @@ class Axis extends SelectionComponent {
         return this;
     }
 
-    private orientAxisTransform() {
+    private orientAxisTransform(): string {
         if (this._axis.orient() === 'bottom') {
             return `translate(0, ${this._chartContainer.effectiveHeight})`;
         } else if (this._axis.orient() === 'right') {
@@ -66,7 +70,7 @@ class Axis extends SelectionComponent {
         return `translate(0, 0)`;
     }
 
-    private orientAxisGridLines(tickSelection: D3.Selection) {
+    private orientAxisGridLines(tickSelection: D3.Selection): D3.Selection {
         if (this._axis.orient() === 'bottom' || this._axis.orient() === 'top') {
             var bt: number = this._axis.orient() === 'bottom' ? -1 : 1;
             tickSelection
